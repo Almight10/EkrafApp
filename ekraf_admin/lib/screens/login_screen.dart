@@ -136,43 +136,29 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildHero() {
     return Column(
       children: [
-        // Logo with glow
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
+        // Dispopar Logo
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
                 color: AppColors.primary.withValues(alpha: 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
-            ),
-            Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primaryContainer, AppColors.primary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.store_rounded, size: 36, color: Colors.white),
-            ),
-          ],
+            ],
+          ),
+          child: Image.asset(
+            'assets/images/logo_dispopar.png',
+            height: 110,
+            fit: BoxFit.contain,
+          ),
         ),
         const SizedBox(height: 20),
         Text(
-          'Ekraf App',
+          'KREASI EKRAF',
           style: GoogleFonts.inter(
             fontSize: 30,
             fontWeight: FontWeight.w800,
