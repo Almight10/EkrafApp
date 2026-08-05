@@ -20,6 +20,15 @@ subprojects {
         project.layout.buildDirectory.value(newSubprojectBuildDir)
     }
     project.evaluationDependsOn(":app")
+
+    afterEvaluate {
+        if (project.plugins.hasPlugin("com.android.application") || project.plugins.hasPlugin("com.android.library")) {
+            val android = project.extensions.findByName("android")
+            if (android is com.android.build.gradle.BaseExtension) {
+                android.ndkVersion = "26.1.10909125"
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {

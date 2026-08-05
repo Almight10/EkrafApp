@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "com.ekraf.ekraf_admin"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "26.1.10909125"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
