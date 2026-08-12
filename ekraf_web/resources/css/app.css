@@ -977,11 +977,31 @@ a { text-decoration: none; color: inherit; }
 
 .product-detail__title { font-family: var(--font-serif); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 800; margin: 0 0 0.5rem; }
 
-.product-detail__owner {
-  display: flex; align-items: center; gap: 1rem;
-  padding: 1.25rem; background: #ffffff;
-  border-radius: 2px; border: 1px solid var(--clr-border);
-  box-shadow: 2px 2px 0px rgba(28, 25, 23, 0.05);
+.product-detail__owner,
+.product-detail__owner-combined {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: #ffffff;
+  border-radius: 2px;
+  border: 1px solid var(--clr-charcoal);
+  box-shadow: 3px 3px 0px rgba(28, 25, 23, 0.15);
+  flex-wrap: wrap;
+}
+
+.owner-info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 170px;
+}
+
+.owner-info-item--since {
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--clr-border);
 }
 
 .product-detail__owner-avatar {
@@ -993,6 +1013,14 @@ a { text-decoration: none; color: inherit; }
   font-family: var(--font-serif); font-weight: 800; font-size: 1.1rem;
   color: var(--clr-terracotta); background: #fceae6;
 }
+.product-detail__owner-avatar--since {
+  background: #fdf3d8;
+  color: var(--clr-terracotta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
 .product-detail__owner-label {
   font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
   text-transform: uppercase; color: var(--clr-muted); margin-bottom: 2px;
@@ -1001,6 +1029,17 @@ a { text-decoration: none; color: inherit; }
   font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700;
   color: var(--clr-charcoal); line-height: 1.3;
 }
+
+@media (max-width: 640px) {
+  .owner-info-item--since {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--clr-border);
+    padding-top: 0.85rem;
+    margin-top: 0.25rem;
+  }
+}
+
 .product-detail__info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
 .info-item {
