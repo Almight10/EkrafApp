@@ -467,6 +467,7 @@ a { text-decoration: none; color: inherit; }
   align-items: center;
   gap: 1.25rem;
   flex-wrap: wrap;
+  margin-top: 1.5rem;
 }
 
 /* Gallery Photo Stack Frame Effect */

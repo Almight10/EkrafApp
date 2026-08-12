@@ -12,7 +12,7 @@
             <p class="hero__desc">
               Platform digital premium untuk mengeksplorasi, mengoleksi, dan merayakan karya terbaik dari 17 sub-sektor ekonomi kreatif Indonesia berbasis Hak Kekayaan Intelektual.
             </p>
-            <div class="hero__actions">
+            <div class="hero__actions" style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; margin-top: 1.5rem;">
               <a href="/katalog" class="btn btn-primary btn-lg">Mulai Eksplorasi</a>
               <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">📱 Daftar Kreator (Download App)</a>
             </div>
