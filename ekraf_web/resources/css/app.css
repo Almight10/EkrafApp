@@ -794,7 +794,7 @@ a { text-decoration: none; color: inherit; }
 
 .filter-bar {
   background: #ffffff;
-  border: 1px solid var(--clr-charcoal);
+  /* border: 1px solid var(--clr-charcoal); */
   padding: 1rem 1.25rem;
   display: flex;
   gap: 1rem;
@@ -805,10 +805,10 @@ a { text-decoration: none; color: inherit; }
   margin-top: 1rem;
 }
 
-.filter-bar:hover {
+/* .filter-bar:hover {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0px rgba(28, 25, 23, 0.15);
-}
+} */
 
 .filter-bar-group {
   display: flex;
@@ -1909,4 +1909,3 @@ a { text-decoration: none; color: inherit; }
   0%, 80%, 100% { transform: scale(0); opacity: 0.2; }
   40% { transform: scale(1); opacity: 1; }
 }
-

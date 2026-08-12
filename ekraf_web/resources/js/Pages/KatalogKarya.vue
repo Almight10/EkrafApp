@@ -53,7 +53,7 @@
             >
               <option value="">Semua Sub-Sektor (17 Sektor)</option>
               <option v-for="s in subSektors" :key="s.id" :value="s.id">
-                {{ s.icon }} {{ s.nama }}
+                {{ s.nama }}
               </option>
             </select>
           </div>
