@@ -284,34 +284,65 @@ async function loadDetail() {
       .from('ekraf_data')
       .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)');
 
-    if (error) throw error;
+    if (error) console.warn('[Ekraf] Supabase query notice:', error?.message || error);
 
     let matchedRow = null;
     if (list && list.length > 0) {
-      // Find row matching target slug or ID
-      matchedRow = list.find(row => {
-        if (row.id === param) return true;
-        const norm = normalizeEkrafData(row);
-        const s1 = slugify(norm.usaha?.nama_usaha);
-        const s2 = slugify(row.nama_brand);
-        const s3 = slugify(row.nama_produk_unggulan);
-        const s4 = slugify(row.nama_usaha);
-        return s1 === targetSlug || s2 === targetSlug || s3 === targetSlug || s4 === targetSlug;
-      });
+      // Step A: Exact ID match
+      matchedRow = list.find(row => String(row.id) === param);
+
+      // Step B: Exact slug match on any name field
+      if (!matchedRow) {
+        matchedRow = list.find(row => {
+          const norm = normalizeEkrafData(row);
+          const candidates = [
+            norm.usaha?.nama_usaha,
+            row.nama_brand,
+            row.namaBrand,
+            row.nama_usaha,
+            row.namaUsaha,
+            row.nama_produk_unggulan,
+            row.namaProdukUnggulan,
+            row.id,
+          ];
+          return candidates.some(c => c && slugify(c) === targetSlug);
+        });
+      }
+
+      // Step C: Flexible substring match
+      if (!matchedRow) {
+        matchedRow = list.find(row => {
+          const norm = normalizeEkrafData(row);
+          const name = (norm.usaha?.nama_usaha || row.nama_brand || row.nama_usaha || '').toLowerCase();
+          const cleanParam = param.toLowerCase().replace(/-/g, ' ');
+          return name && cleanParam && (name.includes(cleanParam) || cleanParam.includes(name));
+        });
+      }
     }
 
     if (matchedRow) {
       produk.value = normalizeEkrafData(matchedRow);
       if (images.value.length > 0) activeImage.value = images.value[0];
     } else {
-      // Fallback to demo items matching slug
-      produk.value = getDemoItemById(param);
-      if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
+      // Search demo items strictly
+      const demoMatch = dummyProducts.find(p => {
+        const s = slugify(p.usaha?.nama_usaha || p.title || p.id);
+        return s === targetSlug || p.id === param;
+      });
+
+      if (demoMatch) {
+        produk.value = demoMatch;
+        if (images.value.length > 0) activeImage.value = images.value[0];
+      } else if (list && list.length > 0) {
+        produk.value = normalizeEkrafData(list[0]);
+        if (images.value.length > 0) activeImage.value = images.value[0];
+      } else {
+        produk.value = dummyProducts[0];
+      }
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat detail:', err?.message || err);
-    produk.value = getDemoItemById(param);
-    if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
+    produk.value = dummyProducts[0];
   } finally {
     loading.value = false;
   }

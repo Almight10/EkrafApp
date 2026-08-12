@@ -112,7 +112,7 @@ export function normalizeEkrafData(row) {
         status_verifikasi: row.status || row.status_verifikasi || 'pending',
         created_at: row.created_at || row.createdAt,
         usaha: {
-            nama_usaha: row.nama_usaha || row.namaUsaha || row.nama_produk_unggulan || 'Karya Ekraf',
+            nama_usaha: row.nama_usaha || row.namaUsaha || row.nama_brand || row.namaBrand || row.nama_produk_unggulan || 'Karya Ekraf',
             sub_sektor_id: normalizeSubSektor(row.sub_sektor || row.subSektor || ''),
             jenis_usaha: row.deskripsi_usaha || row.deskripsiUsaha || '',
             alamat: lokasiLengkap,
