@@ -240,8 +240,26 @@ export const dummyProducts = [
   }
 ];
 
-export function getDemoItemById(id) {
-  const found = dummyProducts.find(p => p.id === id);
-  if (found) return found;
-  return dummyProducts[0];
+export function slugify(text) {
+  if (!text) return '';
+  return text.toString().toLowerCase().trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-');
+}
+
+export function getDemoItemById(identifier) {
+  if (!identifier) return dummyProducts[0];
+  const decoded = decodeURIComponent(identifier).trim();
+  const targetSlug = slugify(decoded);
+
+  const found = dummyProducts.find(p => {
+    if (p.id === decoded || p.id === identifier) return true;
+    const name = p.usaha?.nama_usaha || p.title || '';
+    if (name.toLowerCase() === decoded.toLowerCase()) return true;
+    if (slugify(name) === targetSlug) return true;
+    return false;
+  });
+
+  return found || dummyProducts[0];
 }

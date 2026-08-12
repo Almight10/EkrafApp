@@ -14,7 +14,7 @@
             </p>
             <div class="hero__actions" style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; margin-top: 1.5rem;">
               <a href="/katalog" class="btn btn-primary btn-lg">Mulai Eksplorasi</a>
-              <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">Daftar Kreator</a>
+              <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">📱 Daftar Kreator (Download App)</a>
             </div>
           </div>
 
@@ -152,7 +152,7 @@
           <p style="color:var(--clr-muted);line-height:1.7;margin-bottom:2rem;font-size:0.95rem;">
             Daftarkan portofolio Anda, verifikasi Hak Kekayaan Intelektual (HAKI), dan temukan audiens global untuk karya terbaik Anda.
           </p>
-          <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">Gabung ke Galeri →</a>
+          <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">📱 Download Aplikasi Kreator & Gabung →</a>
         </div>
       </div>
     </section>
@@ -171,39 +171,33 @@ const loading = ref(true);
 const newArrivals = ref([]);
 const stats = ref({ total: '15.000+', haki: '5.000+' });
 
-const fallbackArtworks = [
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="480" viewBox="0 0 400 480"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23c04828"/><stop offset="100%" stop-color="%231c1917"/></linearGradient></defs><rect width="100%" height="100%" fill="url(%23g1)"/><circle cx="200" cy="180" r="90" fill="none" stroke="%23f5b72b" stroke-width="6" opacity="0.8"/><text x="50%" y="80%" font-family="serif" font-size="24" font-weight="bold" fill="%23faf6f0" text-anchor="middle">Seni Digital Ekraf</text><text x="50%" y="87%" font-family="sans-serif" font-size="13" fill="%23f5b72b" text-anchor="middle">Galeri Ekraf HAKI</text></svg>',
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="480" viewBox="0 0 400 480"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%230d7c66"/><stop offset="100%" stop-color="%23054437"/></linearGradient></defs><rect width="100%" height="100%" fill="url(%23g2)"/><polygon points="200,80 280,240 120,240" fill="%23f5ede2" opacity="0.9"/><text x="50%" y="80%" font-family="serif" font-size="24" font-weight="bold" fill="%23faf6f0" text-anchor="middle">Kerajinan Kriya</text><text x="50%" y="87%" font-family="sans-serif" font-size="13" fill="%23e2f2ef" text-anchor="middle">Hasil Karya Artisanal</text></svg>',
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="480" viewBox="0 0 400 480"><defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%238b5cf6"/><stop offset="100%" stop-color="%234c1d95"/></linearGradient></defs><rect width="100%" height="100%" fill="url(%23g3)"/><rect x="100" y="100" width="200" height="140" fill="none" stroke="%23f5b72b" stroke-width="4"/><text x="50%" y="80%" font-family="serif" font-size="24" font-weight="bold" fill="%23faf6f0" text-anchor="middle">Tenun Nusantara</text><text x="50%" y="87%" font-family="sans-serif" font-size="13" fill="%23f5f3ff" text-anchor="middle">Warisan Budaya</text></svg>',
-];
-
 const heroCards = computed(() => {
-  if (newArrivals.value && newArrivals.value.length >= 3) {
-    return newArrivals.value.slice(0, 3).map((item, idx) => ({
-      id: item.id,
-      title: item.usaha?.nama_usaha || 'Karya Ekraf',
-      subSektor: item.usaha?.sub_sektor_id || 'Ekraf',
-      haki: Boolean(item.legalitas?.no_sertifikat_haki),
-      image: item.produk?.foto_produk_urls?.[0] || fallbackArtworks[idx % 3],
-    }));
-  }
-  const defaultDummies = dummyProducts.slice(0, 3);
-  return defaultDummies.map((item, idx) => ({
+  const list = newArrivals.value.length > 0 ? newArrivals.value : dummyProducts;
+  return list.slice(0, 3).map((item, idx) => ({
     id: item.id,
     title: item.usaha?.nama_usaha || 'Karya Ekraf',
-    subSektor: item.usaha?.sub_sektor_id || 'Ekraf',
-    haki: Boolean(item.legalitas?.no_sertifikat_haki),
+    subSektor: item.usaha?.sub_sektor_id || 'kriya',
+    year: item.meta?.member_since || '2026',
     image: item.produk?.foto_produk_urls?.[0] || fallbackArtworks[idx % 3],
+    haki: !!(item.legalitas?.no_sertifikat_haki)
   }));
 });
+
+const fallbackArtworks = [
+  'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80'
+];
 
 function onHeroImgError(event, idx) {
   event.target.src = fallbackArtworks[idx % 3];
 }
 
 function openCardDetail(card) {
-  if (card.id) {
-    router.visit(`/detail/${card.id}`);
+  const name = card.title || card.usaha?.nama_usaha || card.id;
+  if (name) {
+    const slug = slugify(name) || card.id;
+    router.visit(`/detail/${encodeURIComponent(slug)}`);
   } else {
     router.visit('/katalog');
   }

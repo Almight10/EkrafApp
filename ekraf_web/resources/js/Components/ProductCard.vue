@@ -52,7 +52,7 @@
           {{ formattedPrice }}
         </div>
         <div style="display: flex; gap: 6px; flex-shrink: 0;">
-          <button class="btn btn-outline btn-sm" @click.stop="goToDetail">Lihat Detail</button>
+          <button class="btn btn-outline btn-sm" @click.stop="goToDetail">Lihat Karya</button>
           <a
             :href="waLink"
             target="_blank"
@@ -72,6 +72,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
+import { slugify } from '../dummyData.js';
 
 const props = defineProps({
   produk: { type: Object, required: true },
@@ -114,6 +115,10 @@ const hasHaki = computed(() => {
   return !!(props.produk.legalitas?.no_sertifikat_haki);
 });
 
+function onImgError() {
+  imgError.value = true;
+}
+
 const ownerName = computed(() => {
   const name = props.produk.identitas?.nama_lengkap || props.produk.users?.nama_lengkap || props.produk.nama_lengkap || props.produk.namaLengkap;
   return name && name.trim() ? name.trim() : '';
@@ -134,6 +139,8 @@ const waLink = computed(() => {
 });
 
 function goToDetail() {
-  router.visit(`/detail/${props.produk.id}`);
+  const name = props.produk.usaha?.nama_usaha || props.produk.title || props.produk.id;
+  const slug = slugify(name) || props.produk.id;
+  router.visit(`/detail/${encodeURIComponent(slug)}`);
 }
 </script>

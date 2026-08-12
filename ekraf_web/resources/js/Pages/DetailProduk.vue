@@ -265,10 +265,11 @@ const waLink = computed(() => {
 
 async function loadDetail() {
   const pathParts = window.location.pathname.split('/');
-  const id = pathParts[pathParts.length - 1];
+  const rawParam = pathParts[pathParts.length - 1];
+  const param = decodeURIComponent(rawParam).trim();
 
-  if (!isSupabaseConfigured || id.startsWith('demo-')) {
-    produk.value = getDemoItemById(id);
+  if (!isSupabaseConfigured || param.startsWith('demo-')) {
+    produk.value = getDemoItemById(param);
     if (produk.value && images.value.length > 0) {
       activeImage.value = images.value[0];
     }
@@ -277,22 +278,37 @@ async function loadDetail() {
   }
 
   try {
-    const { data, error } = await supabase
+    // 1. Try matching exact UUID id
+    let { data, error } = await supabase
       .from('ekraf_data')
       .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
+      .eq('id', param)
+      .maybeSingle();
+
+    // 2. If not found by ID, search by nama_brand / nama_usaha using the text / slug
+    if (!data) {
+      const searchTerms = param.replace(/-/g, ' ');
+      const { data: list } = await supabase
+        .from('ekraf_data')
+        .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)')
+        .or(`nama_brand.ilike.%${searchTerms}%,nama_usaha.ilike.%${searchTerms}%`)
+        .limit(1);
+
+      if (list && list.length > 0) {
+        data = list[0];
+      }
+    }
+
     if (data) {
       produk.value = normalizeEkrafData(data);
       if (images.value.length > 0) activeImage.value = images.value[0];
     } else {
-      produk.value = getDemoItemById(id);
+      produk.value = getDemoItemById(param);
       if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat detail:', err?.message || err);
-    produk.value = getDemoItemById(id);
+    produk.value = getDemoItemById(param);
     if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
   } finally {
     loading.value = false;
