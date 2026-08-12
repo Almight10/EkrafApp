@@ -62,7 +62,10 @@
 
         <!-- Typography & Brand Titles -->
         <div class="ekraf-loader-title">Ekraf</div>
-        <div class="ekraf-loader-subtitle">Ekonomi Kreatif Kota Probolinggo</div>
+        <!-- Upward Flowing Progress Line Bar -->
+        <div class="ekraf-loader-progress-track">
+          <div class="ekraf-loader-progress-bar"></div>
+        </div>
 
         <!-- Loading Status Indicator -->
         <div class="ekraf-loader-status">
