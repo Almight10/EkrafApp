@@ -52,7 +52,7 @@
           {{ formattedPrice }}
         </div>
         <div style="display: flex; gap: 6px; flex-shrink: 0;">
-          <button class="btn btn-outline btn-sm" @click.stop="goToDetail">Lihat Karya</button>
+          <button class="btn btn-outline btn-sm" @click.stop="goToDetail">Lihat Detail</button>
           <a
             :href="waLink"
             target="_blank"
