@@ -61,5 +61,10 @@ foreach ($envVars as $key => $value) {
     }
 }
 
+$_SERVER['HTTPS'] = 'on';
+$_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
+$_SERVER['HTTP_X_FORWARDED_PORT'] = 443;
+putenv('HTTPS=on');
+
 // Forward Vercel requests to Laravel public index
 require __DIR__ . '/../public/index.php';
