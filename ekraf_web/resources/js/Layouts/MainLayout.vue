@@ -123,7 +123,7 @@
         <div>
           <div style="font-family:var(--font-mono);font-weight:700;font-size:0.75rem;text-transform:uppercase;color:var(--clr-charcoal);margin-bottom:0.75rem;">Pusat Bantuan</div>
           <ul class="footer__links">
-            <li><a href="#">Daftar Sebagai Pengrajin</a></li>
+            <li><a href="https://github.com/Gerryrag/ekrafApp/raw/main/app-release.apk" target="_blank" download>📱 Daftar Sebagai Pengrajin (Download APK)</a></li>
             <li><a href="#">Hubungi Dinas Ekraf</a></li>
           </ul>
         </div>

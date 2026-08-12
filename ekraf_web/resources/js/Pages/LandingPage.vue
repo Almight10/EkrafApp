@@ -14,7 +14,7 @@
             </p>
             <div class="hero__actions">
               <a href="/katalog" class="btn btn-primary btn-lg">Mulai Eksplorasi</a>
-              <a href="#tentang" class="btn btn-outline btn-lg">Daftar Kreator</a>
+              <a href="https://github.com/Gerryrag/ekrafApp/raw/main/app-release.apk" target="_blank" download class="btn btn-outline btn-lg">📱 Daftar Kreator</a>
             </div>
           </div>
 
