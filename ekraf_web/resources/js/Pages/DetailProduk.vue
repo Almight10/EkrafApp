@@ -87,46 +87,54 @@
           <!-- RIGHT: ARTISAN INFO & HAKI CERTIFICATE -->
           <div class="animate-in delay-100" style="display:flex;flex-direction:column;gap:1.5rem;">
 
-            <!-- FOTO PROFIL PELAKU USAHA & ANGGOTA SEJAK (COMBINED CARD) -->
+            <!-- COMBINED ARTISAN INFO CARD (PELAKU USAHA + TAHUN BERDIRI + LOKASI) -->
             <div class="product-detail__owner-combined">
-              <!-- Item 1: Pelaku Usaha -->
-              <div class="owner-info-item">
-                <img
-                  v-if="ownerPhoto && !hasOwnerPhotoError"
-                  :src="ownerPhoto"
-                  :alt="ownerName"
-                  class="product-detail__owner-avatar"
-                  @error="hasOwnerPhotoError = true"
-                />
-                <div
-                  v-else
-                  class="product-detail__owner-avatar product-detail__owner-avatar--placeholder"
-                  aria-hidden="true"
-                >
-                  {{ ownerInitial }}
+              <!-- Top Row: Pelaku Usaha & Tahun Berdiri -->
+              <div class="owner-card__top">
+                <!-- Item 1: Pelaku Usaha -->
+                <div class="owner-info-item">
+                  <img
+                    v-if="ownerPhoto && !hasOwnerPhotoError"
+                    :src="ownerPhoto"
+                    :alt="ownerName"
+                    class="product-detail__owner-avatar"
+                    @error="hasOwnerPhotoError = true"
+                  />
+                  <div
+                    v-else
+                    class="product-detail__owner-avatar product-detail__owner-avatar--placeholder"
+                    aria-hidden="true"
+                  >
+                    {{ ownerInitial }}
+                  </div>
+                  <div>
+                    <div class="product-detail__owner-label">Pelaku Usaha</div>
+                    <div class="product-detail__owner-name">{{ ownerName }}</div>
+                  </div>
                 </div>
-                <div>
-                  <div class="product-detail__owner-label">Pelaku Usaha</div>
-                  <div class="product-detail__owner-name">{{ ownerName }}</div>
+
+                <!-- Item 2: Tahun Berdiri -->
+                <div class="owner-info-item owner-info-item--since">
+                  <div class="product-detail__owner-avatar product-detail__owner-avatar--since" aria-hidden="true">
+                    📅
+                  </div>
+                  <div>
+                    <div class="product-detail__owner-label">Tahun Berdiri</div>
+                    <div class="product-detail__owner-name">{{ produk.meta?.member_since || '2020' }}</div>
+                  </div>
                 </div>
               </div>
 
-              <!-- Item 2: Anggota Sejak -->
-              <div class="owner-info-item owner-info-item--since">
-                <div class="product-detail__owner-avatar product-detail__owner-avatar--since" aria-hidden="true">
-                  📅
+              <!-- Bottom Row: Lokasi -->
+              <div class="owner-card__bottom">
+                <div class="product-detail__owner-avatar product-detail__owner-avatar--location" aria-hidden="true">
+                  📍
                 </div>
                 <div>
-                  <div class="product-detail__owner-label">Anggota Sejak</div>
-                  <div class="product-detail__owner-name">{{ produk.meta?.member_since || '2020' }}</div>
+                  <div class="product-detail__owner-label">Lokasi Usaha</div>
+                  <div class="product-detail__owner-address">{{ produk.usaha?.alamat || 'Kota Probolinggo' }}</div>
                 </div>
               </div>
-            </div>
-
-            <!-- LOKASI ITEM (FULL WIDTH) -->
-            <div class="info-item">
-              <div class="info-item__label">📍 Lokasi</div>
-              <div class="info-item__value">{{ produk.usaha?.alamat || 'Kota Probolinggo' }}</div>
             </div>
 
             <!-- Status HAKI Chip Card -->
