@@ -63,3 +63,6 @@ build/
 !**/ios/Flutter/AppFrameworkInfo.plist
 !**/ios/Runner/Assets.xcassets/
 !**/ios/Runner/Base.lproj/LaunchScreen.storyboard
+
+# Java heap dump files
+*.hprof

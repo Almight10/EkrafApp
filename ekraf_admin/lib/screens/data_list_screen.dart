@@ -59,17 +59,6 @@ class _DataListScreenState extends State<DataListScreen> with SingleTickerProvid
           'Data Ekraf',
           style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<EkrafProvider>().clearFilters();
-              _searchController.clear();
-              _tabController.index = 0;
-            },
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Reset Filter',
-          ),
-        ],
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'admin_datalist_fab',
@@ -88,7 +77,6 @@ class _DataListScreenState extends State<DataListScreen> with SingleTickerProvid
           return Column(
             children: [
               _buildSearchBar(provider),
-              _buildSubSectorChips(provider),
               _buildTabBar(),
               _buildResultInfo(provider),
               Expanded(child: _buildList(context, provider)),
@@ -103,72 +91,84 @@ class _DataListScreenState extends State<DataListScreen> with SingleTickerProvid
     return Container(
       color: AppColors.surface,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: TextField(
-        controller: _searchController,
-        onChanged: provider.setSearch,
-        style: GoogleFonts.inter(fontSize: 14, color: AppColors.textPrimary),
-        decoration: InputDecoration(
-          hintText: 'Cari nama, usaha, NIK...',
-          prefixIcon: const Icon(Icons.search_rounded, size: 20),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 18),
-                  onPressed: () {
-                    _searchController.clear();
-                    provider.setSearch('');
-                  },
-                )
-              : null,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubSectorChips(EkrafProvider provider) {
-    final subSectors = [
-      'Semua Sektor',
-      'Kuliner',
-      'Kriya',
-      'Fesyen',
-      'Musik',
-      'Aplikasi',
-      'Film & Animasi',
-    ];
-
-    return Container(
-      color: AppColors.surface,
-      height: 48,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemCount: subSectors.length,
-        itemBuilder: (context, i) {
-          final label = subSectors[i];
-          final isAll = label == 'Semua Sektor';
-          final isSelected = isAll
-              ? provider.filterSubSektor == null
-              : provider.filterSubSektor == label;
-
-          return FilterChip(
-            label: Text(label,
-                style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? AppColors.onPrimary : AppColors.textSecondary)),
-            selected: isSelected,
-            onSelected: (_) {
-              provider.setFilterSubSektor(isAll ? null : label);
-            },
-            showCheckmark: false,
-            selectedColor: AppColors.primary,
-            backgroundColor: AppColors.surfaceContainerLow,
-            side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.outlineVariant),
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-          );
-        },
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              onChanged: provider.setSearch,
+              style: GoogleFonts.inter(fontSize: 14, color: AppColors.textPrimary),
+              decoration: InputDecoration(
+                hintText: 'Cari nama, usaha, NIK...',
+                prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          provider.setSearch('');
+                        },
+                      )
+                    : null,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: (provider.filterSubSektor != null)
+                  ? AppColors.primary.withValues(alpha: 0.1)
+                  : AppColors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: (provider.filterSubSektor != null)
+                    ? AppColors.primary
+                    : AppColors.outlineVariant,
+              ),
+            ),
+            child: PopupMenuButton<String>(
+              initialValue: provider.filterSubSektor ?? '',
+              constraints: const BoxConstraints(maxHeight: 350, minWidth: 200),
+              onSelected: (val) {
+                provider.setFilterSubSektor(val.isEmpty ? null : val);
+              },
+              icon: Icon(
+                Icons.filter_list_rounded,
+                color: (provider.filterSubSektor != null) ? AppColors.primary : AppColors.textSecondary,
+              ),
+              tooltip: 'Filter Sub-sektor',
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              offset: const Offset(0, 50),
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem<String>(
+                    value: '',
+                    child: Text(
+                      'Semua Sektor',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: provider.filterSubSektor == null ? FontWeight.bold : FontWeight.normal,
+                        color: provider.filterSubSektor == null ? AppColors.primary : AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  ...subSektorEkraf.map((s) => PopupMenuItem<String>(
+                    value: s,
+                    child: Text(
+                      s,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: provider.filterSubSektor == s ? FontWeight.bold : FontWeight.normal,
+                        color: provider.filterSubSektor == s ? AppColors.primary : AppColors.textPrimary,
+                      ),
+                    ),
+                  )),
+                ];
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -298,13 +298,18 @@ class _EkrafListItem extends StatelessWidget {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: AppColors.surfaceContainer,
-                  child: Text(
-                    data.namaLengkap.isNotEmpty ? data.namaLengkap[0].toUpperCase() : '?',
-                    style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ),
+                  backgroundImage: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                      ? NetworkImage(data.fotoUrl!)
+                      : null,
+                  child: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                      ? null
+                      : Text(
+                          data.namaLengkap.isNotEmpty ? data.namaLengkap[0].toUpperCase() : '?',
+                          style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

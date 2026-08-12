@@ -5,7 +5,7 @@ import '../theme/app_theme.dart';
 import '../models/ekraf_data.dart';
 import '../providers/ekraf_provider.dart';
 import '../providers/auth_provider.dart';
-import '../models/user_model.dart';
+import 'input_form_screen.dart';
 
 class DetailScreen extends StatefulWidget {
   final EkrafData data;
@@ -37,7 +37,7 @@ class _DetailScreenState extends State<DetailScreen>
   Widget build(BuildContext context) {
     final data = widget.data;
     final user = context.watch<AuthProvider>().currentUser;
-    final isAdmin = user?.role == UserRole.admin;
+    final isAdmin = user?.isAdmin == true;
 
     Color statusColor;
     String statusLabel;
@@ -64,7 +64,7 @@ class _DetailScreenState extends State<DetailScreen>
       body: NestedScrollView(
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
-            expandedHeight: 180,
+            expandedHeight: 220,
             pinned: true,
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
@@ -78,7 +78,7 @@ class _DetailScreenState extends State<DetailScreen>
                     end: Alignment.bottomRight,
                   ),
                 ),
-                padding: const EdgeInsets.fromLTRB(16, 80, 16, 16),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 60),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -88,15 +88,20 @@ class _DetailScreenState extends State<DetailScreen>
                         CircleAvatar(
                           radius: 24,
                           backgroundColor: Colors.white24,
-                          child: Text(
-                            data.namaLengkap.isNotEmpty
-                                ? data.namaLengkap[0].toUpperCase()
-                                : '?',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700),
-                          ),
+                          backgroundImage: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                              ? NetworkImage(data.fotoUrl!)
+                              : null,
+                          child: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                              ? null
+                              : Text(
+                                  data.namaLengkap.isNotEmpty
+                                      ? data.namaLengkap[0].toUpperCase()
+                                      : '?',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700),
+                                ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -168,10 +173,13 @@ class _DetailScreenState extends State<DetailScreen>
           ],
         ),
       ),
-      // Sticky bottom bar — only show verification actions for Admin on pending items
-      bottomNavigationBar: isAdmin && data.status == VerificationStatus.pending
-          ? _buildVerificationBar(context, data)
-          : null,
+      bottomNavigationBar: isAdmin
+          ? (data.status == VerificationStatus.pending
+              ? _buildVerificationBar(context, data)
+              : _buildEditDeleteBar(context, data))
+          : (data.status != VerificationStatus.verified
+              ? _buildEditDeleteBar(context, data)
+              : null),
     );
   }
 
@@ -216,7 +224,7 @@ class _DetailScreenState extends State<DetailScreen>
           _InfoItem(
               'Jenis HAKI',
               data.hakiTypes
-                  .map((h) => _hakiLabel(h))
+                  .map((h) => _hakiLabel(h).$1)
                   .join(', ')),
           if (data.nomorHaki != null)
             _InfoItem('Nomor HAKI', data.nomorHaki!),
@@ -237,27 +245,75 @@ class _DetailScreenState extends State<DetailScreen>
           if (data.linkMarketplace != null)
             _InfoItem('Marketplace', data.linkMarketplace!),
         ]),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: AppShadows.card,
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.photo_library_outlined,
-                  color: AppColors.textHint),
-              const SizedBox(width: 12),
-              Text(
-                'Foto produk belum tersedia\n(Integrasi Firebase diperlukan)',
-                style: GoogleFonts.inter(
-                    fontSize: 12, color: AppColors.textHint),
+        const SizedBox(height: 20),
+        if (data.productImagePaths.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 8),
+            child: Text(
+              'Foto Produk Unggulan',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
-            ],
+            ),
           ),
-        ),
+          SizedBox(
+            height: 160,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: data.productImagePaths.length,
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, idx) {
+                final imageUrl = data.productImagePaths[idx];
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: AppShadows.card,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        imageUrl,
+                        width: 160,
+                        height: 160,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 160,
+                          height: 160,
+                          color: AppColors.surfaceContainerLow,
+                          child: const Center(
+                            child: Icon(Icons.broken_image_outlined, color: AppColors.error, size: 28),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ] else
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: AppShadows.card,
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.photo_library_outlined, color: AppColors.textHint),
+                const SizedBox(width: 12),
+                Text(
+                  'Foto produk belum tersedia.',
+                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.textHint),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -348,12 +404,161 @@ class _DetailScreenState extends State<DetailScreen>
     );
   }
 
-  void _verify(BuildContext context, EkrafData data) async {
-    await context.read<EkrafProvider>().updateStatus(
-      data.id,
-      VerificationStatus.verified,
+  void _verify(BuildContext context, EkrafData data) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Verifikasi Data Usaha?',
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin memverifikasi data usaha "${data.namaUsaha}" ini? Status data usaha akan berubah menjadi Terverifikasi.',
+          style: GoogleFonts.inter(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await context.read<EkrafProvider>().updateStatus(
+                    data.id,
+                    VerificationStatus.verified,
+                  );
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Data usaha berhasil diverifikasi!'),
+                    backgroundColor: AppColors.tertiary,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(
+              'Verifikasi',
+              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
     );
-    if (context.mounted) Navigator.pop(context);
+  }
+
+  void _editData(BuildContext context, EkrafData data) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => InputFormScreen(data: data),
+      ),
+    );
+    if (result == true && context.mounted) {
+      context.read<EkrafProvider>().loadData();
+      Navigator.pop(context);
+    }
+  }
+
+  void _confirmDelete(BuildContext context, EkrafData data) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Hapus Data Usaha?',
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus data pengajuan usaha "${data.namaUsaha}" ini? Tindakan ini tidak dapat dibatalkan.',
+          style: GoogleFonts.inter(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await context.read<EkrafProvider>().deleteEntry(data.id);
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Data berhasil dihapus.'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(
+              'Hapus',
+              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditDeleteBar(BuildContext context, EkrafData data) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        boxShadow: AppShadows.modal,
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () => _confirmDelete(context, data),
+              icon: const Icon(Icons.delete_outline_rounded, size: 16),
+              label: const Text('Hapus'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+                side: const BorderSide(color: AppColors.error),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 2,
+            child: ElevatedButton.icon(
+              onPressed: () => _editData(context, data),
+              icon: const Icon(Icons.edit_rounded, size: 16),
+              label: const Text('Edit Data'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showRejectDialog(BuildContext context, EkrafData data) {
@@ -409,18 +614,18 @@ class _DetailScreenState extends State<DetailScreen>
     );
   }
 
-  String _hakiLabel(HakiType t) {
+  (String, IconData, Color) _hakiLabel(HakiType t) {
     switch (t) {
       case HakiType.merek:
-        return 'Merek';
-      case HakiType.hak_cipta:
-        return 'Hak Cipta';
+        return ('Merek', Icons.local_offer_outlined, AppColors.primary);
+      case HakiType.hakCipta:
+        return ('Hak Cipta', Icons.copyright_outlined, const Color(0xFF7B61FF));
       case HakiType.paten:
-        return 'Paten';
-      case HakiType.desain_industri:
-        return 'Desain Industri';
-      case HakiType.belum_ada:
-        return 'Belum Ada';
+        return ('Paten', Icons.science_outlined, AppColors.tertiary);
+      case HakiType.desainIndustri:
+        return ('Desain Industri', Icons.design_services_outlined, const Color(0xFFFF6B35));
+      case HakiType.belumAda:
+        return ('Belum Ada', Icons.hourglass_empty_outlined, AppColors.textSecondary);
     }
   }
 }

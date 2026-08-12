@@ -21,12 +21,17 @@ subprojects {
     }
     project.evaluationDependsOn(":app")
 
-    afterEvaluate {
-        if (project.plugins.hasPlugin("com.android.application") || project.plugins.hasPlugin("com.android.library")) {
-            val android = project.extensions.findByName("android")
-            if (android is com.android.build.gradle.BaseExtension) {
-                android.ndkVersion = "26.1.10909125"
-            }
+    // Configure NDK version for Android projects without using afterEvaluate
+    plugins.withId("com.android.application") {
+        val android = extensions.findByName("android")
+        if (android is com.android.build.gradle.BaseExtension) {
+            android.ndkVersion = "28.2.13676358"
+        }
+    }
+    plugins.withId("com.android.library") {
+        val android = extensions.findByName("android")
+        if (android is com.android.build.gradle.BaseExtension) {
+            android.ndkVersion = "28.2.13676358"
         }
     }
 }

@@ -1,123 +1,225 @@
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
+import '../services/auth_service.dart';
+
+// Re-export AuthException agar screen tidak perlu import auth_service secara langsung
+export '../services/auth_service.dart' show AuthException;
 
 class AuthProvider extends ChangeNotifier {
-  AppUser? _currentUser;
-  final List<AppUser> _users = [
-    AppUser(
-      id: 'admin-001',
-      namaLengkap: 'Admin Dinas Ekraf',
-      email: 'admin@ekraf.go.id',
-      role: UserRole.admin,
-    ),
-    AppUser(
-      id: 'pelaku-001',
-      namaLengkap: 'Budi Santoso',
-      email: 'budi.santoso@gmail.com',
-      nik: '7471012505900001',
-      noHp: '081234567890',
-      alamat: 'Jl. Ahmad Yani No. 12, RT 003/RW 004',
-      kecamatan: 'Kecamatan Kendari',
-      kelurahan: 'Kelurahan Kandai',
-      role: UserRole.pelaku,
-    ),
-    AppUser(
-      id: 'pelaku-002',
-      namaLengkap: 'Siti Rahmawati',
-      email: 'siti.rahmawati@email.com',
-      nik: '7471024508950002',
-      noHp: '082345678901',
-      alamat: 'Jl. Sawerigading No. 45',
-      kecamatan: 'Kecamatan Baruga',
-      kelurahan: 'Kelurahan Baruga',
-      role: UserRole.pelaku,
-    ),
-  ];
+  final AuthService _authService = AuthService();
 
+  AppUser? _currentUser;
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  // ── Getters ──────────────────────────────────────────────────────────────────
   AppUser? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
+  // ════════════════════════════════════════════════════════════════════════════
+  // LOGIN
+  // ════════════════════════════════════════════════════════════════════════════
+  /// Melakukan login menggunakan Firebase Authentication.
+  /// Mengembalikan `true` jika berhasil, `false` jika gagal.
   Future<bool> login(String email, String password) async {
-    // Simulate delay
-    await Future.delayed(const Duration(milliseconds: 800));
+    _setLoading(true);
+    _clearError();
 
-    final normalizedEmail = email.trim().toLowerCase();
-    
-    // Check if user exists in our mock database
     try {
-      final user = _users.firstWhere((u) => u.email.toLowerCase() == normalizedEmail);
+      final user = await _authService.login(email, password);
       _currentUser = user;
       notifyListeners();
       return true;
-    } catch (_) {
-      // For demo convenience: if it is admin@ekraf.go.id and password is correct, or if user enters anything, let's create a dynamic user.
-      // But specifically, if they type "admin@ekraf.go.id" or "@ekraf.go.id", make them admin.
-      if (normalizedEmail.endsWith('@ekraf.go.id')) {
-        final newAdmin = AppUser(
-          id: 'admin-gen-${DateTime.now().millisecondsSinceEpoch}',
-          namaLengkap: 'Admin Ekraf',
-          email: normalizedEmail,
-          role: UserRole.admin,
-        );
-        _users.add(newAdmin);
-        _currentUser = newAdmin;
-        notifyListeners();
-        return true;
-      } else {
-        // If not admin, register them dynamically as a mock Pelaku with standard mock details for demo
-        final newPelaku = AppUser(
-          id: 'pelaku-gen-${DateTime.now().millisecondsSinceEpoch}',
-          namaLengkap: normalizedEmail.split('@')[0].toUpperCase(),
-          email: normalizedEmail,
-          nik: '7471000000000000',
-          noHp: '08123456789',
-          alamat: 'Jl. Pemuda No. 1',
-          kecamatan: 'Kecamatan Wua-Wua',
-          kelurahan: 'Kelurahan Wua-Wua',
-          role: UserRole.pelaku,
-        );
-        _users.add(newPelaku);
-        _currentUser = newPelaku;
-        notifyListeners();
-        return true;
-      }
+    } on AuthException catch (e) {
+      _errorMessage = e.message;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = 'Terjadi kesalahan tidak terduga. Coba lagi.';
+      notifyListeners();
+      return false;
+    } finally {
+      _setLoading(false);
     }
   }
 
+  // ════════════════════════════════════════════════════════════════════════════
+  // REGISTER
+  // ════════════════════════════════════════════════════════════════════════════
+  /// Mendaftarkan pengguna baru menggunakan Firebase Authentication.
+  /// Data pengguna disimpan ke Cloud Firestore.
+  /// Melempar [AuthException] jika gagal.
   Future<void> register({
     required String namaLengkap,
     required String email,
+    required String password,
+    String? noHp,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      await _authService.register(
+        namaLengkap: namaLengkap,
+        email: email,
+        password: password,
+        noHp: noHp,
+      );
+      // Tidak set currentUser setelah register — pengguna diarahkan ke Login
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      throw AuthException(
+        code: 'unknown',
+        message: 'Terjadi kesalahan: ${e.toString()}',
+      );
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // UPDATE PROFILE
+  // ════════════════════════════════════════════════════════════════════════════
+  /// Memperbarui profil pelaku ekraf di database Supabase.
+  Future<void> updateProfile({
     required String nik,
-    required String noHp,
     required String alamat,
     required String kecamatan,
     required String kelurahan,
+    String? ktpUrl,
+    String? fotoUrl,
+    String? noHp,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-    final normalizedEmail = email.trim().toLowerCase();
+    _setLoading(true);
+    _clearError();
 
-    // Check if user already exists
-    _users.removeWhere((u) => u.email.toLowerCase() == normalizedEmail);
+    try {
+      final user = await _authService.updateProfile(
+        nik: nik,
+        alamat: alamat,
+        kecamatan: kecamatan,
+        kelurahan: kelurahan,
+        ktpUrl: ktpUrl,
+        fotoUrl: fotoUrl,
+        noHp: noHp,
+      );
+      _currentUser = user;
+      notifyListeners();
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      throw AuthException(
+        code: 'unknown',
+        message: 'Terjadi kesalahan: ${e.toString()}',
+      );
+    } finally {
+      _setLoading(false);
+    }
+  }
 
-    final newUser = AppUser(
-      id: 'pelaku-reg-${DateTime.now().millisecondsSinceEpoch}',
-      namaLengkap: namaLengkap.trim(),
-      email: normalizedEmail,
-      nik: nik.trim(),
-      noHp: noHp.trim(),
-      alamat: alamat.trim(),
-      kecamatan: kecamatan,
-      kelurahan: kelurahan,
-      role: UserRole.pelaku,
-    );
+  Future<void> updateProfileNameAndPhone({
+    required String namaLengkap,
+    required String noHp,
+  }) async {
+    _setLoading(true);
+    _clearError();
 
-    _users.add(newUser);
-    _currentUser = newUser;
+    try {
+      final user = await _authService.updateProfileNameAndPhone(
+        namaLengkap: namaLengkap,
+        noHp: noHp,
+      );
+      _currentUser = user;
+      notifyListeners();
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      throw AuthException(
+        code: 'unknown',
+        message: 'Terjadi kesalahan: ${e.toString()}',
+      );
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> changePassword(String newPassword) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      await _authService.updatePassword(newPassword);
+      notifyListeners();
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      throw AuthException(
+        code: 'unknown',
+        message: 'Terjadi kesalahan: ${e.toString()}',
+      );
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // FORGOT PASSWORD
+  // ════════════════════════════════════════════════════════════════════════════
+  /// Mengirim email reset password menggunakan Firebase Authentication.
+  /// Melempar [AuthException] jika email tidak ditemukan atau terjadi error.
+  Future<void> sendPasswordReset(String email) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      await _authService.sendPasswordResetEmail(email);
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      throw AuthException(
+        code: 'unknown',
+        message: 'Terjadi kesalahan: ${e.toString()}',
+      );
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // CHECK SESSION
+  // ════════════════════════════════════════════════════════════════════════════
+  Future<bool> checkSession() async {
+    try {
+      final user = await _authService.tryRestoreSession();
+      if (user != null) {
+        _currentUser = user;
+        notifyListeners();
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // LOGOUT
+  // ════════════════════════════════════════════════════════════════════════════
+  Future<void> logout() async {
+    await _authService.logout();
+    _currentUser = null;
+    _clearError();
     notifyListeners();
   }
 
-  void logout() {
-    _currentUser = null;
+  // ── Private Helpers ──────────────────────────────────────────────────────────
+  void _setLoading(bool value) {
+    _isLoading = value;
     notifyListeners();
+  }
+
+  void _clearError() {
+    _errorMessage = null;
   }
 }
