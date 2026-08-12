@@ -202,7 +202,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { supabase, isSupabaseConfigured, normalizeEkrafData } from '../supabase.js';
-import { dummyProducts, getDemoItemById } from '../dummyData.js';
+import { dummyProducts, getDemoItemById, slugify } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
 
 const loading = ref(true);
@@ -263,23 +263,14 @@ const waLink = computed(() => {
   return `https://wa.me/${formattedPhone}?text=${text}`;
 });
 
-function extractId(param) {
-  if (!param) return '';
-  const uuidMatch = param.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-  if (uuidMatch) return uuidMatch[0];
-  const demoMatch = param.match(/demo-\d+/i);
-  if (demoMatch) return demoMatch[0];
-  return param;
-}
-
 async function loadDetail() {
   const pathParts = window.location.pathname.split('/');
   const rawParam = pathParts[pathParts.length - 1];
   const param = decodeURIComponent(rawParam).trim();
-  const targetId = extractId(param);
+  const targetSlug = slugify(param);
 
-  if (!isSupabaseConfigured || targetId.startsWith('demo-')) {
-    produk.value = getDemoItemById(targetId || param);
+  if (!isSupabaseConfigured) {
+    produk.value = getDemoItemById(param);
     if (produk.value && images.value.length > 0) {
       activeImage.value = images.value[0];
     }
@@ -288,37 +279,38 @@ async function loadDetail() {
   }
 
   try {
-    // 1. Try matching exact UUID id
-    let { data, error } = await supabase
+    // 1. Fetch rows from Supabase ekraf_data table to match pure slug or ID
+    const { data: list, error } = await supabase
       .from('ekraf_data')
-      .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)')
-      .eq('id', targetId)
-      .maybeSingle();
+      .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)');
 
-    // 2. If not found by ID, search by nama_brand / nama_usaha using search terms
-    if (!data) {
-      const searchTerms = param.replace(/--.*$/, '').replace(/-/g, ' ');
-      const { data: list } = await supabase
-        .from('ekraf_data')
-        .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)')
-        .or(`nama_brand.ilike.%${searchTerms}%,nama_usaha.ilike.%${searchTerms}%`)
-        .limit(1);
+    if (error) throw error;
 
-      if (list && list.length > 0) {
-        data = list[0];
-      }
+    let matchedRow = null;
+    if (list && list.length > 0) {
+      // Find row matching target slug or ID
+      matchedRow = list.find(row => {
+        if (row.id === param) return true;
+        const norm = normalizeEkrafData(row);
+        const s1 = slugify(norm.usaha?.nama_usaha);
+        const s2 = slugify(row.nama_brand);
+        const s3 = slugify(row.nama_produk_unggulan);
+        const s4 = slugify(row.nama_usaha);
+        return s1 === targetSlug || s2 === targetSlug || s3 === targetSlug || s4 === targetSlug;
+      });
     }
 
-    if (data) {
-      produk.value = normalizeEkrafData(data);
+    if (matchedRow) {
+      produk.value = normalizeEkrafData(matchedRow);
       if (images.value.length > 0) activeImage.value = images.value[0];
     } else {
-      produk.value = getDemoItemById(targetId || param);
+      // Fallback to demo items matching slug
+      produk.value = getDemoItemById(param);
       if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat detail:', err?.message || err);
-    produk.value = getDemoItemById(targetId || param);
+    produk.value = getDemoItemById(param);
     if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
   } finally {
     loading.value = false;
