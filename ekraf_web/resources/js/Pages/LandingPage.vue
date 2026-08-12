@@ -4,38 +4,86 @@
     <section class="hero">
       <div class="container">
         <div class="hero__inner">
-          <!-- Left: Headlines & CTAs -->
-          <div class="animate-in">
+          <!-- Left: Headlines, Mobile Showcase & CTAs -->
+          <div class="animate-in hero__content">
             <h1 class="display-xl" style="margin:0 0 1.25rem;">
               Rayakan <span class="serif-italic">Kreativitas</span><br>Anak Bangsa
             </h1>
             <p class="hero__desc">
               Platform digital premium untuk mengeksplorasi, mengoleksi, dan merayakan karya terbaik dari 17 sub-sektor ekonomi kreatif Indonesia berbasis Hak Kekayaan Intelektual.
             </p>
-            <div class="hero__actions" style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; margin-top: 1.5rem;">
+
+            <!-- TIMED ARTWORK SHOWCASE SLIDER (MOBILE VIEW POSITIONED BEFORE CTAS) -->
+            <div class="hero__showcase-mobile animate-in delay-100">
+              <div v-if="activeCard" class="hero__showcase-card" @click="openCardDetail(activeCard)">
+                <div v-if="activeCard.haki" class="hero__photo-badge">✓ HAKI</div>
+                <div class="hero__showcase-img-wrap">
+                  <transition name="hero-slide" mode="out-in">
+                    <img
+                      :key="activeCard.id || currentSlide"
+                      :src="activeCard.image"
+                      :alt="activeCard.title"
+                      class="hero__showcase-img"
+                      @error="onHeroImgError($event, currentSlide)"
+                    />
+                  </transition>
+                </div>
+                <div class="hero__showcase-caption">
+                  <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">
+                    <div class="hero__photo-title">{{ activeCard.title }}</div>
+                    <div class="hero__photo-sub">{{ activeCard.subSektor }} • Karya Pilihan</div>
+                  </div>
+                  <!-- Slide dots -->
+                  <div class="hero__showcase-dots">
+                    <span
+                      v-for="(c, idx) in heroCards"
+                      :key="idx"
+                      class="hero__dot"
+                      :class="{ active: currentSlide === idx }"
+                      @click.stop="currentSlide = idx"
+                    ></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hero Action Buttons -->
+            <div class="hero__actions">
               <a href="/katalog" class="btn btn-primary btn-lg">Mulai Eksplorasi</a>
               <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">Daftar Kreator (Download App)</a>
             </div>
           </div>
 
-          <!-- Right: Gallery Polaroid Photo Stack -->
-          <div class="hero__photo-stack animate-in delay-200">
-            <div
-              v-for="(card, idx) in heroCards"
-              :key="card.id || idx"
-              :class="['hero__photo-card', `hero__photo-card--${idx + 1}`]"
-              @click="openCardDetail(card)"
-              :title="`Lihat detail ${card.title}`"
-            >
-              <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
-              <img
-                :src="card.image"
-                :alt="card.title"
-                @error="onHeroImgError($event, idx)"
-              />
-              <div class="hero__photo-caption">
-                <span class="hero__photo-title">{{ card.title }}</span>
-                <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
+          <!-- Right: Desktop Timed Showcase Card -->
+          <div class="hero__showcase-desktop animate-in delay-200">
+            <div v-if="activeCard" class="hero__showcase-card hero__showcase-card--desktop" @click="openCardDetail(activeCard)">
+              <div v-if="activeCard.haki" class="hero__photo-badge">✓ HAKI Terverifikasi</div>
+              <div class="hero__showcase-img-wrap">
+                <transition name="hero-slide" mode="out-in">
+                  <img
+                    :key="activeCard.id || currentSlide"
+                    :src="activeCard.image"
+                    :alt="activeCard.title"
+                    class="hero__showcase-img"
+                    @error="onHeroImgError($event, currentSlide)"
+                  />
+                </transition>
+              </div>
+              <div class="hero__showcase-caption">
+                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">
+                  <div class="hero__photo-title">{{ activeCard.title }}</div>
+                  <div class="hero__photo-sub">{{ activeCard.subSektor }} • 2026</div>
+                </div>
+                <!-- Slide dots -->
+                <div class="hero__showcase-dots">
+                  <span
+                    v-for="(c, idx) in heroCards"
+                    :key="idx"
+                    class="hero__dot"
+                    :class="{ active: currentSlide === idx }"
+                    @click.stop="currentSlide = idx"
+                  ></span>
+                </div>
               </div>
             </div>
           </div>
@@ -160,20 +208,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { supabase, isSupabaseConfigured, normalizeEkrafData, isApprovedEkrafData } from '../supabase.js';
-import { dummyProducts } from '../dummyData.js';
+import { dummyProducts, slugify } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
 import ProductCard from '../Components/ProductCard.vue';
 
 const loading = ref(true);
 const newArrivals = ref([]);
 const stats = ref({ total: '15.000+', haki: '5.000+' });
+const currentSlide = ref(0);
+let slideTimer = null;
 
 const heroCards = computed(() => {
   const list = newArrivals.value.length > 0 ? newArrivals.value : dummyProducts;
-  return list.slice(0, 3).map((item, idx) => ({
+  return list.slice(0, 5).map((item, idx) => ({
     id: item.id,
     title: item.usaha?.nama_usaha || 'Karya Ekraf',
     subSektor: item.usaha?.sub_sektor_id || 'kriya',
@@ -182,6 +232,24 @@ const heroCards = computed(() => {
     haki: !!(item.legalitas?.no_sertifikat_haki)
   }));
 });
+
+const activeCard = computed(() => {
+  if (!heroCards.value || heroCards.value.length === 0) return null;
+  return heroCards.value[currentSlide.value % heroCards.value.length];
+});
+
+function startTimer() {
+  stopTimer();
+  slideTimer = setInterval(() => {
+    if (heroCards.value.length > 0) {
+      currentSlide.value = (currentSlide.value + 1) % heroCards.value.length;
+    }
+  }, 3500);
+}
+
+function stopTimer() {
+  if (slideTimer) clearInterval(slideTimer);
+}
 
 const fallbackArtworks = [
   'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=800&q=80',
@@ -266,5 +334,10 @@ async function loadData() {
 
 onMounted(() => {
   loadData();
+  startTimer();
+});
+
+onUnmounted(() => {
+  stopTimer();
 });
 </script>
