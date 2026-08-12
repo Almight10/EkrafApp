@@ -9,6 +9,7 @@ import '../models/user_model.dart';
 import 'input_form_screen.dart';
 import 'detail_screen.dart';
 import 'login_screen.dart';
+import 'lengkapi_profile_screen.dart';
 
 class PelakuDashboardScreen extends StatefulWidget {
   const PelakuDashboardScreen({super.key});
@@ -59,16 +60,221 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
   }
 
   void _logout() {
-    final authProvider = context.read<AuthProvider>();
-    authProvider.logout();
-    Navigator.of(context).pushAndRemoveUntil(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const LoginScreen(),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 300),
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Konfirmasi Logout',
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin keluar dari akun ini?',
+          style: GoogleFonts.inter(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              final authProvider = context.read<AuthProvider>();
+              authProvider.logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => const LoginScreen(),
+                  transitionsBuilder: (_, anim, __, child) =>
+                      FadeTransition(opacity: anim, child: child),
+                  transitionDuration: const Duration(milliseconds: 300),
+                ),
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('Keluar', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
-      (route) => false,
+    );
+  }
+
+  void _showNotifications() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const Icon(Icons.notifications_none_rounded, color: AppColors.primary),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Notifikasi',
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              const Icon(Icons.notifications_off_outlined, size: 60, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                'Belum ada notifikasi baru',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showHelp() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const Icon(Icons.help_outline_rounded, color: AppColors.primary),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Petunjuk Pelaku Ekraf',
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _buildHelpItem(
+                number: '1',
+                title: 'Ajukan Usaha Anda',
+                desc: 'Tekan tombol "Unggah Data Usaha" di kanan bawah untuk mendaftarkan usaha kreatif Anda.',
+              ),
+              const SizedBox(height: 16),
+              _buildHelpItem(
+                number: '2',
+                title: 'Pantau Verifikasi',
+                desc: 'Usaha yang Anda daftarkan akan ditinjau oleh Admin Dinas. Anda bisa memantau statusnya di halaman utama ini.',
+              ),
+              const SizedBox(height: 16),
+              _buildHelpItem(
+                number: '3',
+                title: 'Revisi Data Usaha',
+                desc: 'Jika pengajuan ditolak, baca alasan penolakan dari admin, lalu lakukan perbaikan data dengan menekan tombol perbaikan.',
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHelpItem({required String number, required String title, required String desc}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: const BoxDecoration(
+            color: AppColors.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              number,
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                desc,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -84,9 +290,12 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
       );
     }
 
+    final bool hasIncompleteProfile = user.nik == null || user.nik!.trim().isEmpty;
+
     final userSubmissions = ekrafProvider.data.where((item) {
-      return item.email.toLowerCase() == user.email.toLowerCase() ||
-          (user.nik != null && item.nik == user.nik);
+      return item.userId == user.id ||
+          (item.email.isNotEmpty && item.email.toLowerCase() == user.email.toLowerCase()) ||
+          (user.nik != null && user.nik!.isNotEmpty && item.nik == user.nik);
     }).toList();
 
     final verified = userSubmissions
@@ -108,34 +317,67 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryContainer],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            ClipRect(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                widthFactor: 0.38,
+                child: Image.asset(
+                  'assets/images/logo_dispopar2.png',
+                  height: 42,
+                  fit: BoxFit.cover,
                 ),
-                borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.storefront_rounded, size: 20, color: Colors.white),
             ),
-            const SizedBox(width: 10),
-            Text(
-              'Ekraf Pelaku',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-                color: AppColors.textPrimary,
-              ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'DISPOPAR',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                    color: const Color(0xFFF39200),
+                    height: 1.1,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  'PROAKTIF',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 11,
+                    color: const Color(0xFF006885),
+                    height: 1.1,
+                    letterSpacing: 3.0,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, size: 22),
+            color: AppColors.textSecondary,
+            onPressed: _showNotifications,
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline_rounded, size: 22),
+            color: AppColors.textSecondary,
+            onPressed: _showHelp,
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'pelaku_dashboard_fab',
         onPressed: () async {
+          if (hasIncompleteProfile) {
+            _showIncompleteProfileAlert();
+            return;
+          }
           final provider = context.read<EkrafProvider>();
           await Navigator.push(
             context,
@@ -166,6 +408,13 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
                 ),
               ),
             ),
+            if (hasIncompleteProfile)
+              SliverToBoxAdapter(
+                child: FadeTransition(
+                  opacity: _heroFade,
+                  child: _buildIncompleteProfileBanner(),
+                ),
+              ),
             SliverToBoxAdapter(
               child: FadeTransition(
                 opacity: _heroFade,
@@ -226,7 +475,7 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => FadeTransition(
                     opacity: _listFade,
-                    child: _SubmissionCard(
+                    child: SubmissionCard(
                       data: userSubmissions[index],
                       onTap: () async {
                         await Navigator.push(
@@ -256,7 +505,6 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF003A6B), Color(0xFF004787), Color(0xFF0B5FAE)],
@@ -272,35 +520,38 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
           ),
         ],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
           // Decorative
           Positioned(
-            right: -10,
-            top: -15,
+            right: -15,
+            top: -20,
             child: Container(
-              width: 90,
-              height: 90,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.07),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
           Positioned(
-            right: 50,
-            bottom: -20,
+            right: 40,
+            bottom: -30,
             child: Container(
-              width: 60,
-              height: 60,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withValues(alpha: 0.05),
               ),
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -313,15 +564,32 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
                       border: Border.all(
                           color: Colors.white.withValues(alpha: 0.3), width: 2),
                     ),
-                    child: Center(
-                      child: Text(
-                        initials,
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                    child: ClipOval(
+                      child: (user.fotoUrl != null && user.fotoUrl!.isNotEmpty)
+                          ? Image.network(
+                              user.fotoUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Center(
+                                child: Text(
+                                  initials,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                initials,
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -402,7 +670,125 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
               _InfoChip(icon: Icons.email_outlined, text: user.email),
             ],
           ),
+        ),
+      ],
+    ),
+  );
+  }
+
+  Widget _buildIncompleteProfileBanner() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3E0), // Orange warning bg
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFB74D), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.error_outline_rounded,
+                color: Color(0xFFE65100),
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Profil Belum Lengkap',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFE65100),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Silakan lengkapi NIK, foto profil, dan alamat lengkap Anda terlebih dahulu agar dapat mengunggah data usaha.',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: const Color(0xFF5D4037),
+                        height: 1.4,
+                      ),
+                    ),
+
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const LengkapiProfileScreen()),
+                );
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFFE65100),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.edit_note_rounded, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Lengkapi Data Diri Sekarang',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  void _showIncompleteProfileAlert() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Mohon lengkapi data diri Anda terlebih dahulu sebelum mengunggah data usaha.',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'LENGKAPI',
+          textColor: Colors.white,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const LengkapiProfileScreen()),
+            );
+          },
+        ),
       ),
     );
   }
@@ -589,17 +975,17 @@ class _MiniStat extends StatelessWidget {
 }
 
 // ── Submission Card ───────────────────────────────────────────────────────────
-class _SubmissionCard extends StatefulWidget {
+class SubmissionCard extends StatefulWidget {
   final EkrafData data;
   final VoidCallback onTap;
 
-  const _SubmissionCard({required this.data, required this.onTap});
+  const SubmissionCard({required this.data, required this.onTap, super.key});
 
   @override
-  State<_SubmissionCard> createState() => _SubmissionCardState();
+  State<SubmissionCard> createState() => SubmissionCardState();
 }
 
-class _SubmissionCardState extends State<_SubmissionCard> {
+class SubmissionCardState extends State<SubmissionCard> {
   bool _pressed = false;
 
   @override

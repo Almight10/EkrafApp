@@ -80,6 +80,11 @@ class EkrafProvider extends ChangeNotifier {
     await loadData();
   }
 
+  Future<void> updateEntry(EkrafData data) async {
+    await _service.updateData(data);
+    await loadData();
+  }
+
   Future<void> updateStatus(
     String id,
     VerificationStatus status, {

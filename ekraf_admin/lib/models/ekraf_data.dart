@@ -10,14 +10,15 @@ enum VerificationStatus {
 
 enum HakiType {
   merek,
-  hak_cipta,
+  hakCipta,
   paten,
-  desain_industri,
-  belum_ada,
+  desainIndustri,
+  belumAda,
 }
 
 class EkrafData {
   final String id;
+  final String userId;
 
   // Identitas Pelaku
   final String namaLengkap;
@@ -28,6 +29,7 @@ class EkrafData {
   final String alamat;
   final String kecamatan;
   final String kelurahan;
+  final String? fotoUrl;
 
   // Data Usaha
   final String namaUsaha;
@@ -56,6 +58,7 @@ class EkrafData {
 
   EkrafData({
     String? id,
+    required this.userId,
     required this.namaLengkap,
     required this.nik,
     this.ktpImagePath,
@@ -64,6 +67,7 @@ class EkrafData {
     required this.alamat,
     required this.kecamatan,
     required this.kelurahan,
+    this.fotoUrl,
     required this.namaUsaha,
     required this.subSektor,
     required this.deskripsiUsaha,
@@ -91,6 +95,7 @@ class EkrafData {
   }) {
     return EkrafData(
       id: id,
+      userId: userId,
       namaLengkap: namaLengkap,
       nik: nik,
       ktpImagePath: ktpImagePath,
@@ -99,6 +104,7 @@ class EkrafData {
       alamat: alamat,
       kecamatan: kecamatan,
       kelurahan: kelurahan,
+      fotoUrl: fotoUrl,
       namaUsaha: namaUsaha,
       subSektor: subSektor,
       deskripsiUsaha: deskripsiUsaha,
@@ -129,6 +135,69 @@ class EkrafData {
         return 'Menunggu';
     }
   }
+
+  factory EkrafData.fromSupabase(Map<String, dynamic> map) {
+    final users = map['users'] as Map<String, dynamic>?;
+    return EkrafData(
+      id: map['id'] as String,
+      userId: map['user_id'] as String? ?? '',
+      namaLengkap: map['nama_lengkap'] as String? ?? (users != null ? (users['nama_lengkap'] as String? ?? '') : ''),
+      nik: map['nik'] as String? ?? (users != null ? (users['nik'] as String? ?? '') : ''),
+      ktpImagePath: null,
+      noHp: map['no_hp'] as String? ?? (users != null ? (users['no_hp'] as String? ?? '') : ''),
+      email: map['email'] as String? ?? (users != null ? (users['email'] as String? ?? '') : ''),
+      alamat: map['alamat'] as String? ?? (users != null ? (users['alamat'] as String? ?? '') : ''),
+      kecamatan: map['kecamatan'] as String? ?? (users != null ? (users['kecamatan'] as String? ?? '') : ''),
+      kelurahan: map['kelurahan'] as String? ?? (users != null ? (users['kelurahan'] as String? ?? '') : ''),
+      fotoUrl: map['foto_url'] as String? ?? (users != null ? (users['foto_url'] as String?) : null),
+      namaUsaha: map['nama_usaha'] as String? ?? '',
+      subSektor: map['sub_sektor'] as String? ?? '',
+      deskripsiUsaha: map['deskripsi_usaha'] as String? ?? '',
+      tahunBerdiri: map['tahun_berdiri'] as String? ?? '',
+      jumlahKaryawan: map['jumlah_karyawan'] as int? ?? 0,
+      omzetPerBulan: map['omzet_per_bulan'] as String? ?? '',
+      hakiTypes: (map['haki_types'] as String? ?? '')
+          .split(',')
+          .where((s) => s.isNotEmpty)
+          .map((s) => HakiType.values.firstWhere((e) => e.name == s, orElse: () => HakiType.belumAda))
+          .toList(),
+      nomorHaki: map['nomor_haki'] as String?,
+      tahunHaki: map['tahun_haki'] as String?,
+      productImagePaths: (map['product_image_paths'] as String? ?? '')
+          .split(',')
+          .where((s) => s.isNotEmpty)
+          .toList(),
+      namaProdukUnggulan: map['nama_produk_unggulan'] as String? ?? '',
+      hargaProduk: map['harga_produk'] as String? ?? '',
+      linkMarketplace: map['link_marketplace'] as String?,
+      status: VerificationStatus.values.firstWhere((e) => e.name == (map['status'] as String? ?? 'pending'), orElse: () => VerificationStatus.pending),
+      createdAt: DateTime.parse(map['created_at'] as String),
+      verifiedAt: map['verified_at'] != null ? DateTime.parse(map['verified_at'] as String) : null,
+      catatanAdmin: map['catatan_admin'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toSupabase(String userId) {
+    return {
+      'user_id': userId,
+      'nama_usaha': namaUsaha,
+      'sub_sektor': subSektor,
+      'deskripsi_usaha': deskripsiUsaha,
+      'tahun_berdiri': tahunBerdiri,
+      'jumlah_karyawan': jumlahKaryawan,
+      'omzet_per_bulan': omzetPerBulan,
+      'haki_types': hakiTypes.map((e) => e.name).join(','),
+      'nomor_haki': nomorHaki,
+      'tahun_haki': tahunHaki,
+      'product_image_paths': productImagePaths.join(','),
+      'nama_produk_unggulan': namaProdukUnggulan,
+      'harga_produk': hargaProduk,
+      'link_marketplace': linkMarketplace,
+      'status': status.name,
+      'catatan_admin': catatanAdmin,
+      'verified_at': verifiedAt?.toIso8601String(),
+    };
+  }
 }
 
 // Sub-sektor Ekraf berdasarkan Perpres No. 142/2018
@@ -152,18 +221,48 @@ const List<String> subSektorEkraf = [
   'Lainnya',
 ];
 
-const List<String> kecamatanList = [
-  'Kecamatan Abeli',
-  'Kecamatan Baruga',
-  'Kecamatan Kambu',
-  'Kecamatan Kendari',
-  'Kecamatan Kendari Barat',
-  'Kecamatan Kadia',
-  'Kecamatan Mandonga',
-  'Kecamatan Poasia',
-  'Kecamatan Puuwatu',
-  'Kecamatan Wua-Wua',
-];
+const Map<String, List<String>> probolinggoData = {
+  'Kecamatan Kademangan': [
+    'Kelurahan Kademangan',
+    'Kelurahan Ketapang',
+    'Kelurahan Pilang',
+    'Kelurahan Pohsangit Kidul',
+    'Kelurahan Triwung Kidul',
+    'Kelurahan Triwung Lor',
+  ],
+  'Kecamatan Kanigaran': [
+    'Kelurahan Curahgrinting',
+    'Kelurahan Kanigaran',
+    'Kelurahan Kebonsari Kulon',
+    'Kelurahan Kebonsari Wetan',
+    'Kelurahan Tisnonegaran',
+  ],
+  'Kecamatan Kedopok': [
+    'Kelurahan Jrebeng Lor',
+    'Kelurahan Jrebeng Wetan',
+    'Kelurahan Kedopok',
+    'Kelurahan Kopian',
+    'Kelurahan Sumber Wetan',
+    'Kelurahan Kareng Lor',
+  ],
+  'Kecamatan Mayangan': [
+    'Kelurahan Jati',
+    'Kelurahan Mangunharjo',
+    'Kelurahan Mayangan',
+    'Kelurahan Sukabumi',
+    'Kelurahan Wiroborang',
+  ],
+  'Kecamatan Wonoasih': [
+    'Kelurahan Jrebeng Kidul',
+    'Kelurahan Kedunggaleng',
+    'Kelurahan Kedungasem',
+    'Kelurahan Pakistaji',
+    'Kelurahan Sumbertaman',
+    'Kelurahan Wonoasih',
+  ],
+};
+
+List<String> get kecamatanList => probolinggoData.keys.toList();
 
 const List<String> omzetRanges = [
   'Di bawah Rp 1 Juta',

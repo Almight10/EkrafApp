@@ -1,14 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 import '../models/ekraf_data.dart';
 import '../providers/ekraf_provider.dart';
 import '../providers/auth_provider.dart';
 
 class InputFormScreen extends StatefulWidget {
-  const InputFormScreen({super.key});
+  final EkrafData? data;
+  const InputFormScreen({super.key, this.data});
 
   @override
   State<InputFormScreen> createState() => _InputFormScreenState();
@@ -19,6 +23,50 @@ class _InputFormScreenState extends State<InputFormScreen> {
   int _currentStep = 0;
   bool _isSaving = false;
 
+  final List<dynamic> _allProductImages = [];
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickProductImage() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Ambil dari Kamera'),
+              onTap: () async {
+                Navigator.of(context).pop();
+                final picked = await _picker.pickImage(source: ImageSource.camera, imageQuality: 70);
+                if (picked != null) {
+                  setState(() {
+                    _allProductImages.add(File(picked.path));
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () async {
+                Navigator.of(context).pop();
+                final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+                if (picked != null) {
+                  setState(() {
+                    _allProductImages.add(File(picked.path));
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // Step 1 - Identitas
   final _namaController = TextEditingController();
   final _nikController = TextEditingController();
@@ -26,27 +74,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
   final _emailController = TextEditingController();
   final _alamatController = TextEditingController();
   String? _selectedKecamatan;
-  final _kelurahanController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = context.read<AuthProvider>();
-      final user = authProvider.currentUser;
-      if (user != null && user.isPelaku) {
-        setState(() {
-          _namaController.text = user.namaLengkap;
-          _nikController.text = user.nik ?? '';
-          _emailController.text = user.email;
-          _noHpController.text = user.noHp ?? '';
-          _alamatController.text = user.alamat ?? '';
-          _selectedKecamatan = user.kecamatan;
-          _kelurahanController.text = user.kelurahan ?? '';
-        });
-      }
-    });
-  }
+  String? _selectedKelurahan;
 
   // Step 2 - Usaha
   final _namaUsahaController = TextEditingController();
@@ -57,7 +85,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
   String? _selectedOmzet;
 
   // Step 3 - Legalitas (HAKI)
-  final Set<HakiType> _selectedHaki = {HakiType.belum_ada};
+  final Set<HakiType> _selectedHaki = {HakiType.belumAda};
   final _nomorHakiController = TextEditingController();
   final _tahunHakiController = TextEditingController();
 
@@ -67,13 +95,62 @@ class _InputFormScreenState extends State<InputFormScreen> {
   final _marketplaceController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.data != null) {
+      final d = widget.data!;
+      _namaController.text = d.namaLengkap;
+      _nikController.text = d.nik;
+      _noHpController.text = d.noHp;
+      _emailController.text = d.email;
+      _alamatController.text = d.alamat;
+      _selectedKecamatan = d.kecamatan.isEmpty ? null : d.kecamatan;
+      _selectedKelurahan = d.kelurahan.isEmpty ? null : d.kelurahan;
+
+      _namaUsahaController.text = d.namaUsaha;
+      _selectedSubSektor = d.subSektor.isEmpty ? null : d.subSektor;
+      _deskripsiController.text = d.deskripsiUsaha;
+      _tahunBerdiriController.text = d.tahunBerdiri;
+      _karyawanController.text = d.jumlahKaryawan.toString();
+      _selectedOmzet = d.omzetPerBulan.isEmpty ? null : d.omzetPerBulan;
+
+      _selectedHaki.clear();
+      _selectedHaki.addAll(d.hakiTypes);
+      _nomorHakiController.text = d.nomorHaki ?? '';
+      _tahunHakiController.text = d.tahunHaki ?? '';
+
+      _namaProdukController.text = d.namaProdukUnggulan;
+      _hargaController.text = d.hargaProduk;
+      _marketplaceController.text = d.linkMarketplace ?? '';
+
+      _allProductImages.addAll(d.productImagePaths);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final authProvider = context.read<AuthProvider>();
+        final user = authProvider.currentUser;
+        if (user != null && user.isPelaku) {
+          setState(() {
+            _namaController.text = user.namaLengkap;
+            _nikController.text = user.nik ?? '';
+            _emailController.text = user.email;
+            _noHpController.text = user.noHp ?? '';
+            _alamatController.text = user.alamat ?? '';
+            _selectedKecamatan = user.kecamatan;
+            _selectedKelurahan = user.kelurahan;
+          });
+        }
+      });
+    }
+  }
+
+
+  @override
   void dispose() {
     _namaController.dispose();
     _nikController.dispose();
     _noHpController.dispose();
     _emailController.dispose();
     _alamatController.dispose();
-    _kelurahanController.dispose();
     _namaUsahaController.dispose();
     _deskripsiController.dispose();
     _tahunBerdiriController.dispose();
@@ -100,7 +177,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          'Tambah Data Ekraf',
+          widget.data != null ? 'Edit Data Ekraf' : 'Tambah Data Ekraf',
           style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         leading: IconButton(
@@ -257,50 +334,6 @@ class _InputFormScreenState extends State<InputFormScreen> {
         ),
         const SizedBox(height: 16),
         _buildFieldContainer(
-          label: 'Foto KTP',
-          sensitivity: _Sensitivity.sensitif,
-          child: Column(
-            children: [
-              _buildDashedPicker(
-                label: 'Ambil Foto / Pilih dari Galeri',
-                subLabel: 'Maksimal ukuran file 5MB (JPG/PNG)',
-                icon: Icons.photo_camera_outlined,
-              ),
-              const SizedBox(height: 8),
-              _buildWarningBox('Data ini terenkripsi dan hanya dapat diakses oleh Admin untuk verifikasi.'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildFieldContainer(
-          label: 'Foto Diri / Profil',
-          sensitivity: _Sensitivity.publik,
-          child: Row(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainer,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.outlineVariant),
-                ),
-                child: const Icon(Icons.person_outline, size: 28, color: AppColors.textHint),
-              ),
-              const SizedBox(width: 16),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text('Unggah Foto'),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildFieldContainer(
           label: 'No. WhatsApp',
           sensitivity: _Sensitivity.publik,
           child: _buildField(
@@ -342,25 +375,68 @@ class _InputFormScreenState extends State<InputFormScreen> {
         _buildFieldContainer(
           label: 'Kecamatan',
           sensitivity: _Sensitivity.publik,
-          child: _buildDropdown(
-            label: 'Kecamatan',
-            value: _selectedKecamatan,
-            items: kecamatanList,
-            icon: Icons.location_city_outlined,
-            onChanged: isPelaku ? null : (v) => setState(() => _selectedKecamatan = v),
+          child: DropdownButtonFormField<String>(
+            initialValue: _selectedKecamatan,
+            items: () {
+              final List<String> effectiveList = List<String>.from(kecamatanList);
+              if (_selectedKecamatan != null && !effectiveList.contains(_selectedKecamatan)) {
+                effectiveList.add(_selectedKecamatan!);
+              }
+              return effectiveList
+                  .map((s) => DropdownMenuItem(
+                        value: s,
+                        child: Text(s, style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14)),
+                      ))
+                  .toList();
+            }(),
+            onChanged: isPelaku ? null : (v) {
+              setState(() {
+                _selectedKecamatan = v;
+                _selectedKelurahan = null;
+              });
+            },
             validator: (v) => v == null ? 'Pilih kecamatan' : null,
+            dropdownColor: AppColors.surface,
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
+            decoration: const InputDecoration(
+              hintText: 'Pilih Kecamatan',
+              prefixIcon: Icon(Icons.location_city_outlined),
+            ),
           ),
         ),
         const SizedBox(height: 16),
         _buildFieldContainer(
           label: 'Kelurahan',
           sensitivity: _Sensitivity.publik,
-          child: _buildField(
-            controller: _kelurahanController,
-            hint: 'Masukkan kelurahan',
-            icon: Icons.apartment_outlined,
-            readOnly: isPelaku,
-            validator: _required,
+          child: DropdownButtonFormField<String>(
+            initialValue: _selectedKelurahan,
+            items: () {
+              final List<String> rawKelurahan = probolinggoData[_selectedKecamatan] ?? [];
+              final List<String> effectiveList = List<String>.from(rawKelurahan);
+              if (_selectedKelurahan != null && !effectiveList.contains(_selectedKelurahan)) {
+                effectiveList.add(_selectedKelurahan!);
+              }
+              return effectiveList
+                  .map((s) => DropdownMenuItem(
+                        value: s,
+                        child: Text(s, style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14)),
+                      ))
+                  .toList();
+            }(),
+            onChanged: (isPelaku || _selectedKecamatan == null) ? null : (v) {
+              setState(() {
+                _selectedKelurahan = v;
+              });
+            },
+            validator: (v) => v == null ? 'Pilih kelurahan' : null,
+            dropdownColor: AppColors.surface,
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
+            decoration: InputDecoration(
+              hintText: _selectedKecamatan == null 
+                  ? 'Pilih kecamatan terlebih dahulu' 
+                  : 'Pilih Kelurahan',
+              prefixIcon: const Icon(Icons.apartment_outlined),
+            ),
           ),
         ),
       ],
@@ -467,7 +543,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
 
   // ── STEP 3: Legalitas (HAKI) ───────────────────────────
   Widget _buildStep3() {
-    final hasHaki = !_selectedHaki.contains(HakiType.belum_ada);
+    final hasHaki = !_selectedHaki.contains(HakiType.belumAda);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -490,14 +566,14 @@ class _InputFormScreenState extends State<InputFormScreen> {
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        if (t == HakiType.belum_ada) {
+                        if (t == HakiType.belumAda) {
                           _selectedHaki.clear();
-                          _selectedHaki.add(HakiType.belum_ada);
+                          _selectedHaki.add(HakiType.belumAda);
                         } else {
-                          _selectedHaki.remove(HakiType.belum_ada);
+                          _selectedHaki.remove(HakiType.belumAda);
                           if (selected) {
                             _selectedHaki.remove(t);
-                            if (_selectedHaki.isEmpty) _selectedHaki.add(HakiType.belum_ada);
+                            if (_selectedHaki.isEmpty) _selectedHaki.add(HakiType.belumAda);
                           } else {
                             _selectedHaki.add(t);
                           }
@@ -612,11 +688,96 @@ class _InputFormScreenState extends State<InputFormScreen> {
               Text('Maks. 5 foto produk unggulan',
                   style: GoogleFonts.inter(color: AppColors.textHint, fontSize: 11)),
               const SizedBox(height: 12),
-              _buildDashedPicker(
-                label: 'Unggah Foto Produk',
-                subLabel: 'JPG/PNG (Maksimal 5MB)',
-                icon: Icons.add_photo_alternate_outlined,
-              ),
+              if (_allProductImages.isNotEmpty) ...[
+                SizedBox(
+                  height: 100,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _allProductImages.length,
+                    separatorBuilder: (context, index) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final file = _allProductImages[index];
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: file is File
+                                ? Image.file(
+                                    file,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.network(
+                                    file as String,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (ctx, err, st) => Container(
+                                      width: 100,
+                                      height: 100,
+                                      color: Colors.grey[200],
+                                      child: const Icon(Icons.broken_image, size: 20),
+                                    ),
+                                  ),
+                          ),
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => setState(() => _allProductImages.removeAt(index)),
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.close, size: 12, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (_allProductImages.length < 5)
+                GestureDetector(
+                  onTap: _pickProductImage,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.outlineVariant, style: BorderStyle.solid),
+                    ),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.add_a_photo_outlined, color: AppColors.primary, size: 24),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Unggah Foto Produk (${_allProductImages.length}/5)',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'JPG/PNG (Maksimal 5MB)',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -637,7 +798,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
             _SummaryRow('NIK', _nikController.text),
             _SummaryRow('WhatsApp', _noHpController.text),
             _SummaryRow('Email', _emailController.text.isEmpty ? '-' : _emailController.text),
-            _SummaryRow('Alamat', '${_alamatController.text}, Kel. ${_kelurahanController.text}, Kec. ${_selectedKecamatan ?? ''}'),
+            _SummaryRow('Alamat', '${_alamatController.text}, Kel. ${_selectedKelurahan ?? ''}, Kec. ${_selectedKecamatan ?? ''}'),
           ],
         ),
         const SizedBox(height: 16),
@@ -772,56 +933,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
     );
   }
 
-  Widget _buildDashedPicker({
-    required String label,
-    required String subLabel,
-    required IconData icon,
-  }) {
-    return GestureDetector(
-      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fitur kamera aktif setelah integrasi Firebase')),
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.outlineVariant, style: BorderStyle.solid),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                shape: BoxShape.circle,
-                boxShadow: AppShadows.card,
-              ),
-              child: Icon(icon, color: AppColors.primary, size: 24),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subLabel,
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildWarningBox(String text) {
     return Container(
@@ -927,9 +1039,15 @@ class _InputFormScreenState extends State<InputFormScreen> {
     required void Function(String?)? onChanged,
     String? Function(String?)? validator,
   }) {
+    // Cegah crash jika nilai dari database tidak ada di list pilihan dropdown
+    final List<String> effectiveItems = List<String>.from(items);
+    if (value != null && !effectiveItems.contains(value)) {
+      effectiveItems.add(value);
+    }
+
     return DropdownButtonFormField<String>(
       initialValue: value,
-      items: items
+      items: effectiveItems
           .map((s) => DropdownMenuItem(
                 value: s,
                 child: Text(s, style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14)),
@@ -991,42 +1109,125 @@ class _InputFormScreenState extends State<InputFormScreen> {
       }
     } else {
       if (!_formKey.currentState!.validate()) return;
-      setState(() => _isSaving = true);
-
-      final newData = EkrafData(
-        namaLengkap: _namaController.text.trim(),
-        nik: _nikController.text.trim(),
-        noHp: _noHpController.text.trim(),
-        email: _emailController.text.trim(),
-        alamat: _alamatController.text.trim(),
-        kecamatan: _selectedKecamatan ?? '',
-        kelurahan: _kelurahanController.text.trim(),
-        namaUsaha: _namaUsahaController.text.trim(),
-        subSektor: _selectedSubSektor ?? '',
-        deskripsiUsaha: _deskripsiController.text.trim(),
-        tahunBerdiri: _tahunBerdiriController.text.trim(),
-        jumlahKaryawan: int.tryParse(_karyawanController.text) ?? 0,
-        omzetPerBulan: _selectedOmzet ?? '',
-        hakiTypes: _selectedHaki.toList(),
-        nomorHaki: _nomorHakiController.text.isEmpty ? null : _nomorHakiController.text,
-        tahunHaki: _tahunHakiController.text.isEmpty ? null : _tahunHakiController.text,
-        productImagePaths: [],
-        namaProdukUnggulan: _namaProdukController.text.trim(),
-        hargaProduk: _hargaController.text.trim(),
-        linkMarketplace: _marketplaceController.text.isEmpty ? null : _marketplaceController.text,
-      );
-
-      await context.read<EkrafProvider>().addEntry(newData);
-
-      if (mounted) {
-        setState(() => _isSaving = false);
-        Navigator.pop(context);
+      if (_allProductImages.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Data berhasil disimpan!'),
-            backgroundColor: AppColors.tertiary,
+            content: Text('Mohon unggah minimal 1 foto produk unggulan.'),
+            backgroundColor: AppColors.error,
           ),
         );
+        return;
+      }
+
+      setState(() => _isSaving = true);
+
+      try {
+        final List<String> uploadedUrls = [];
+        final authProvider = context.read<AuthProvider>();
+        final userId = authProvider.currentUser?.id ?? '';
+        final isAdmin = authProvider.currentUser?.isAdmin == true;
+        final ekrafProvider = context.read<EkrafProvider>();
+
+        for (int i = 0; i < _allProductImages.length; i++) {
+          final item = _allProductImages[i];
+          if (item is String) {
+            uploadedUrls.add(item);
+          } else if (item is File) {
+            final bytes = await item.readAsBytes();
+            final fileExt = item.path.split('.').last;
+            final path = 'products/${userId}_${DateTime.now().millisecondsSinceEpoch}_$i.$fileExt';
+
+            // Unggah ke bucket 'profiles'
+            await Supabase.instance.client.storage.from('profiles').uploadBinary(path, bytes);
+            final publicUrl = Supabase.instance.client.storage.from('profiles').getPublicUrl(path);
+            uploadedUrls.add(publicUrl);
+          }
+        }
+
+        if (widget.data != null) {
+          // Mode Edit: update data yang sudah ada
+          final updatedData = EkrafData(
+            id: widget.data!.id,
+            userId: widget.data!.userId,
+            createdAt: widget.data!.createdAt,
+            namaLengkap: _namaController.text.trim(),
+            nik: _nikController.text.trim(),
+            noHp: _noHpController.text.trim(),
+            email: _emailController.text.trim(),
+            alamat: _alamatController.text.trim(),
+            kecamatan: _selectedKecamatan ?? '',
+            kelurahan: _selectedKelurahan ?? '',
+            namaUsaha: _namaUsahaController.text.trim(),
+            subSektor: _selectedSubSektor ?? '',
+            deskripsiUsaha: _deskripsiController.text.trim(),
+            tahunBerdiri: _tahunBerdiriController.text.trim(),
+            jumlahKaryawan: int.tryParse(_karyawanController.text) ?? 0,
+            omzetPerBulan: _selectedOmzet ?? '',
+            hakiTypes: _selectedHaki.toList(),
+            nomorHaki: _nomorHakiController.text.isEmpty ? null : _nomorHakiController.text,
+            tahunHaki: _tahunHakiController.text.isEmpty ? null : _tahunHakiController.text,
+            productImagePaths: uploadedUrls,
+            namaProdukUnggulan: _namaProdukController.text.trim(),
+            hargaProduk: _hargaController.text.trim(),
+            linkMarketplace: _marketplaceController.text.isEmpty ? null : _marketplaceController.text,
+            status: isAdmin
+                ? widget.data!.status
+                : VerificationStatus.pending,
+            catatanAdmin: isAdmin
+                ? widget.data!.catatanAdmin
+                : null, // Reset catatan admin penolakan jika pelaku mengedit datanya kembali
+          );
+
+          await ekrafProvider.updateEntry(updatedData);
+        } else {
+          // Mode Tambah Baru
+          final newData = EkrafData(
+            userId: userId,
+            namaLengkap: _namaController.text.trim(),
+            nik: _nikController.text.trim(),
+            noHp: _noHpController.text.trim(),
+            email: _emailController.text.trim(),
+            alamat: _alamatController.text.trim(),
+            kecamatan: _selectedKecamatan ?? '',
+            kelurahan: _selectedKelurahan ?? '',
+            namaUsaha: _namaUsahaController.text.trim(),
+            subSektor: _selectedSubSektor ?? '',
+            deskripsiUsaha: _deskripsiController.text.trim(),
+            tahunBerdiri: _tahunBerdiriController.text.trim(),
+            jumlahKaryawan: int.tryParse(_karyawanController.text) ?? 0,
+            omzetPerBulan: _selectedOmzet ?? '',
+            hakiTypes: _selectedHaki.toList(),
+            nomorHaki: _nomorHakiController.text.isEmpty ? null : _nomorHakiController.text,
+            tahunHaki: _tahunHakiController.text.isEmpty ? null : _tahunHakiController.text,
+            productImagePaths: uploadedUrls,
+            namaProdukUnggulan: _namaProdukController.text.trim(),
+            hargaProduk: _hargaController.text.trim(),
+            linkMarketplace: _marketplaceController.text.isEmpty ? null : _marketplaceController.text,
+          );
+
+          await ekrafProvider.addEntry(newData);
+        }
+
+        if (mounted) {
+          setState(() => _isSaving = false);
+          Navigator.pop(context, true); // Return true to indicate data changed
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Data berhasil disimpan!'),
+              backgroundColor: AppColors.tertiary,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal menyimpan data: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
       }
     }
   }
@@ -1063,10 +1264,10 @@ class _InputFormScreenState extends State<InputFormScreen> {
   String _hakiLabel(HakiType t) {
     switch (t) {
       case HakiType.merek: return 'Merek';
-      case HakiType.hak_cipta: return 'Hak Cipta';
+      case HakiType.hakCipta: return 'Hak Cipta';
       case HakiType.paten: return 'Paten';
-      case HakiType.desain_industri: return 'Desain Industri';
-      case HakiType.belum_ada: return 'Belum Ada';
+      case HakiType.desainIndustri: return 'Desain Industri';
+      case HakiType.belumAda: return 'Belum Ada';
     }
   }
 }

@@ -20,6 +20,20 @@ subprojects {
         project.layout.buildDirectory.value(newSubprojectBuildDir)
     }
     project.evaluationDependsOn(":app")
+
+    // Configure NDK version for Android projects without using afterEvaluate
+    plugins.withId("com.android.application") {
+        val android = extensions.findByName("android")
+        if (android is com.android.build.gradle.BaseExtension) {
+            android.ndkVersion = "28.2.13676358"
+        }
+    }
+    plugins.withId("com.android.library") {
+        val android = extensions.findByName("android")
+        if (android is com.android.build.gradle.BaseExtension) {
+            android.ndkVersion = "28.2.13676358"
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
