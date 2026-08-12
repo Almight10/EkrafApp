@@ -21,7 +21,7 @@
         </div>
 
         <!-- CATEGORY CHIPS SCROLLBAR (MOBILE & DESKTOP QUICK SELECT) -->
-        <div class="category-chips-scroll">
+        <!-- <div class="category-chips-scroll">
           <button
             class="chip-item"
             :class="{ active: filterSektor === '' }"
@@ -38,7 +38,7 @@
           >
             <span>{{ s.icon }}</span> <span>{{ s.nama.split(' ')[0] }}</span>
           </button>
-        </div>
+        </div> -->
 
         <!-- COMPACT FILTER BAR CONTAINING SELECTS -->
         <div class="filter-bar">
