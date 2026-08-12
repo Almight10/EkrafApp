@@ -19,7 +19,7 @@
 
         <!-- Desktop Actions -->
         <div class="navbar__actions--desktop">
-          <button @click="testLoading" class="btn btn-outline btn-sm" title="Uji Coba Animasi Loading">⚡ Preview Loading</button>
+          <!-- <button @click="testLoading" class="btn btn-outline btn-sm" title="Uji Coba Animasi Loading">⚡ Preview Loading</button> -->
           <Link href="/katalog" class="btn btn-primary btn-sm">🔍 Cari Karya</Link>
         </div>
 
