@@ -462,6 +462,13 @@ a { text-decoration: none; color: inherit; }
   line-height: 1.7;
 }
 
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
 /* Gallery Photo Stack Frame Effect */
 .hero__photo-stack {
   position: relative;
