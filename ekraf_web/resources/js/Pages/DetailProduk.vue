@@ -263,13 +263,23 @@ const waLink = computed(() => {
   return `https://wa.me/${formattedPhone}?text=${text}`;
 });
 
+function extractId(param) {
+  if (!param) return '';
+  const uuidMatch = param.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+  if (uuidMatch) return uuidMatch[0];
+  const demoMatch = param.match(/demo-\d+/i);
+  if (demoMatch) return demoMatch[0];
+  return param;
+}
+
 async function loadDetail() {
   const pathParts = window.location.pathname.split('/');
   const rawParam = pathParts[pathParts.length - 1];
   const param = decodeURIComponent(rawParam).trim();
+  const targetId = extractId(param);
 
-  if (!isSupabaseConfigured || param.startsWith('demo-')) {
-    produk.value = getDemoItemById(param);
+  if (!isSupabaseConfigured || targetId.startsWith('demo-')) {
+    produk.value = getDemoItemById(targetId || param);
     if (produk.value && images.value.length > 0) {
       activeImage.value = images.value[0];
     }
@@ -282,12 +292,12 @@ async function loadDetail() {
     let { data, error } = await supabase
       .from('ekraf_data')
       .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)')
-      .eq('id', param)
+      .eq('id', targetId)
       .maybeSingle();
 
-    // 2. If not found by ID, search by nama_brand / nama_usaha using the text / slug
+    // 2. If not found by ID, search by nama_brand / nama_usaha using search terms
     if (!data) {
-      const searchTerms = param.replace(/-/g, ' ');
+      const searchTerms = param.replace(/--.*$/, '').replace(/-/g, ' ');
       const { data: list } = await supabase
         .from('ekraf_data')
         .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)')
@@ -303,12 +313,12 @@ async function loadDetail() {
       produk.value = normalizeEkrafData(data);
       if (images.value.length > 0) activeImage.value = images.value[0];
     } else {
-      produk.value = getDemoItemById(param);
+      produk.value = getDemoItemById(targetId || param);
       if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat detail:', err?.message || err);
-    produk.value = getDemoItemById(param);
+    produk.value = getDemoItemById(targetId || param);
     if (produk.value && images.value.length > 0) activeImage.value = images.value[0];
   } finally {
     loading.value = false;

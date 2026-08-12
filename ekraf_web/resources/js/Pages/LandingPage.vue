@@ -194,10 +194,11 @@ function onHeroImgError(event, idx) {
 }
 
 function openCardDetail(card) {
-  const name = card.title || card.usaha?.nama_usaha || card.id;
-  if (name) {
-    const slug = slugify(name) || card.id;
-    router.visit(`/detail/${encodeURIComponent(slug)}`);
+  const name = card.title || card.usaha?.nama_usaha || 'karya';
+  const id = card.id;
+  if (id) {
+    const slug = slugify(name);
+    router.visit(`/detail/${encodeURIComponent(slug)}--${id}`);
   } else {
     router.visit('/katalog');
   }

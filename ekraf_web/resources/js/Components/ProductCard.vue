@@ -139,8 +139,9 @@ const waLink = computed(() => {
 });
 
 function goToDetail() {
-  const name = props.produk.usaha?.nama_usaha || props.produk.title || props.produk.id;
-  const slug = slugify(name) || props.produk.id;
-  router.visit(`/detail/${encodeURIComponent(slug)}`);
+  const name = props.produk.usaha?.nama_usaha || props.produk.title || 'karya';
+  const slug = slugify(name);
+  const id = props.produk.id;
+  router.visit(`/detail/${encodeURIComponent(slug)}--${id}`);
 }
 </script>
