@@ -19,8 +19,8 @@
 
         <!-- Desktop Actions -->
         <div class="navbar__actions--desktop">
-          <!-- <button @click="testLoading" class="btn btn-outline btn-sm" title="Uji Coba Animasi Loading">⚡ Preview Loading</button> -->
-          <Link href="/katalog" class="btn btn-primary btn-sm">🔍 Cari Karya</Link>
+          <!-- <button @click="testLoading" class="btn btn-outline btn-sm" title="Uji Coba Animasi Loading">Preview Loading</button> -->
+          <Link href="/katalog" class="btn btn-primary btn-sm">Cari Karya</Link>
         </div>
 
         <!-- Mobile Hamburger Toggle Button -->
@@ -48,8 +48,7 @@
               @click="closeMobileMenu"
               class="mobile-drawer__link"
             >
-              <span>🏠 Beranda</span>
-              <span>→</span>
+              <span>Beranda</span>
             </Link>
             <Link
               href="/katalog"
@@ -57,34 +56,14 @@
               @click="closeMobileMenu"
               class="mobile-drawer__link"
             >
-              <span>🎨 Katalog Karya</span>
-              <span>→</span>
+              <span>Katalog Karya</span>
             </Link>
-            <a
-              href="/katalog?sektor=kuliner"
-              @click="closeMobileMenu"
-              class="mobile-drawer__link mobile-drawer__link--sub"
-            >
-              <span>🍴 Sub-Sektor Ekraf</span>
-              <span>→</span>
-            </a>
-            <a
-              href="#tentang"
-              @click="closeMobileMenu"
-              class="mobile-drawer__link mobile-drawer__link--sub"
-            >
-              <span>📜 Daftar & Info HAKI</span>
-              <span>→</span>
-            </a>
           </div>
 
           <div class="mobile-drawer__actions">
             <Link href="/katalog" @click="closeMobileMenu" class="btn btn-primary btn-lg" style="width: 100%; text-align: center;">
-              🔍 Cari Karya Creative
+              Cari Karya
             </Link>
-            <button @click="handleTestLoadingMobile" class="btn btn-outline btn-lg" style="width: 100%; text-align: center;">
-              ⚡ Preview Loading Animation
-            </button>
           </div>
         </div>
       </transition>
@@ -123,7 +102,7 @@
         <div>
           <div style="font-family:var(--font-mono);font-weight:700;font-size:0.75rem;text-transform:uppercase;color:var(--clr-charcoal);margin-bottom:0.75rem;">Pusat Bantuan</div>
           <ul class="footer__links">
-            <li><a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer">📱 Download Aplikasi Kreator (APK)</a></li>
+            <li><a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer">Download Aplikasi Kreator</a></li>
             <li><a href="#">Hubungi Dinas Ekraf</a></li>
           </ul>
         </div>

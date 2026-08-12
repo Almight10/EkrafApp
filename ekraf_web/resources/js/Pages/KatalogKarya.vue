@@ -1,37 +1,55 @@
 <template>
   <MainLayout>
     <!-- PAGE HEADER & FILTER BAR -->
-    <div style="background:var(--clr-bg);padding:3rem 0 1.5rem;border-bottom:1px solid var(--clr-border);">
+    <div class="katalog-header-wrap">
       <div class="container">
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;">
+        <div class="katalog-header__top">
           <div>
             <h1 class="display-xl" style="margin:0 0 0.5rem;">Explore the <span class="serif-italic">Collection</span></h1>
-            <p style="color:var(--clr-muted);font-size:1rem;margin:0;">Jelajahi dan apresiasi portofolio karya kreatif terverifikasi HAKI seluruh daerah.</p>
+            <p style="color:var(--clr-muted);font-size:0.95rem;margin:0;">Jelajahi dan apresiasi portofolio karya kreatif terverifikasi HAKI seluruh daerah.</p>
           </div>
-          <div class="search-wrap" style="max-width:340px;">
+          <div class="search-wrap">
             <span class="search-icon">🔍</span>
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search creatives, sectors, regions..."
+              placeholder="Cari karya, sektor, kreator..."
               class="search-input"
               id="search-katalog"
             />
           </div>
         </div>
 
-        <!-- DROPDOWN FILTER BAR CONTAINING ALL 17 SUB-SECTORS -->
-        <div class="filter-bar" style="margin-top:2rem;">
-          <!-- Dropdown 17 Sub-Sektor -->
-          <div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:260px;">
-            <label for="select-sektor" style="font-family:var(--font-mono);font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--clr-muted);white-space:nowrap;">
-              Sub-Sektor Ekraf:
+        <!-- CATEGORY CHIPS SCROLLBAR (MOBILE & DESKTOP QUICK SELECT) -->
+        <div class="category-chips-scroll">
+          <button
+            class="chip-item"
+            :class="{ active: filterSektor === '' }"
+            @click="filterSektor = ''"
+          >
+            ✨ Semua (17)
+          </button>
+          <button
+            v-for="s in subSektors"
+            :key="s.id"
+            class="chip-item"
+            :class="{ active: filterSektor === s.id }"
+            @click="filterSektor = s.id"
+          >
+            <span>{{ s.icon }}</span> <span>{{ s.nama.split(' ')[0] }}</span>
+          </button>
+        </div>
+
+        <!-- COMPACT FILTER BAR CONTAINING SELECTS -->
+        <div class="filter-bar">
+          <div class="filter-bar-group">
+            <label for="select-sektor" class="filter-label">
+              Sub-Sektor:
             </label>
             <select
               id="select-sektor"
               v-model="filterSektor"
               class="filter-select"
-              style="flex:1;"
             >
               <option value="">Semua Sub-Sektor (17 Sektor)</option>
               <option v-for="s in subSektors" :key="s.id" :value="s.id">
@@ -40,9 +58,8 @@
             </select>
           </div>
 
-          <!-- Dropdown Status HAKI -->
-          <div style="display:flex;align-items:center;gap:0.6rem;min-width:200px;">
-            <label for="select-haki" style="font-family:var(--font-mono);font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--clr-muted);white-space:nowrap;">
+          <div class="filter-bar-group">
+            <label for="select-haki" class="filter-label">
               Status HAKI:
             </label>
             <select
@@ -58,19 +75,18 @@
 
           <!-- Reset Filter Button -->
           <button
-            v-if="filterSektor || filterHaki"
+            v-if="filterSektor || filterHaki || searchQuery"
             @click="resetFilter"
-            class="btn btn-sm btn-outline"
-            style="white-space:nowrap;"
+            class="btn btn-sm btn-outline filter-reset-btn"
           >
-            ✕ Reset Filter
+            ✕ Reset
           </button>
         </div>
       </div>
     </div>
 
     <!-- KATALOG GRID CONTENT -->
-    <div class="container" style="padding:2.5rem 1.5rem 4rem;">
+    <div class="container katalog-grid-container">
       <div v-if="loading" class="grid-catalog">
         <SkeletonCard v-for="i in 6" :key="i" />
       </div>
@@ -80,8 +96,7 @@
         <h3 style="color:var(--clr-charcoal);margin:0 0 0.5rem;font-family:var(--font-serif);">Tidak ada karya ditemukan</h3>
         <p style="margin-bottom:1.5rem;">Coba sesuaikan kata kunci atau filter sub-sektor Anda.</p>
         <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
-          <button v-if="filterSektor || filterHaki" @click="resetFilter" class="btn btn-outline">Reset Filter</button>
-          <button v-if="searchQuery" @click="searchQuery = ''" class="btn btn-outline">Hapus Pencarian</button>
+          <button v-if="filterSektor || filterHaki || searchQuery" @click="resetFilter" class="btn btn-outline">Reset Filter</button>
         </div>
       </div>
 
@@ -107,23 +122,23 @@ const loading = ref(true);
 const produkList = ref([]);
 
 const subSektors = [
-  { id: 'kuliner', nama: 'Kuliner' },
-  { id: 'kriya', nama: 'Kriya' },
-  { id: 'fesyen', nama: 'Fesyen' },
-  { id: 'musik', nama: 'Musik' },
-  { id: 'seni-pertunjukan', nama: 'Seni Pertunjukan' },
-  { id: 'seni-rupa', nama: 'Seni Rupa' },
-  { id: 'dkv', nama: 'Desain Komunikasi Visual (DKV)' },
-  { id: 'desain-produk', nama: 'Desain Produk' },
-  { id: 'desain-interior', nama: 'Desain Interior' },
-  { id: 'arsitektur', nama: 'Arsitektur' },
-  { id: 'fotografi', nama: 'Fotografi' },
-  { id: 'game', nama: 'Pengembangan Game' },
-  { id: 'aplikasi', nama: 'Pengembang Aplikasi' },
-  { id: 'film', nama: 'Film, Animasi & Video' },
-  { id: 'iklan', nama: 'Periklanan' },
-  { id: 'penerbitan', nama: 'Penerbitan' },
-  { id: 'tv-radio', nama: 'TV & Radio' },
+  { id: 'kuliner', nama: 'Kuliner', icon: '🍴' },
+  { id: 'kriya', nama: 'Kriya', icon: '🪡' },
+  { id: 'fesyen', nama: 'Fesyen', icon: '👕' },
+  { id: 'musik', nama: 'Musik', icon: '🎵' },
+  { id: 'seni-pertunjukan', nama: 'Seni Pertunjukan', icon: '🎭' },
+  { id: 'seni-rupa', nama: 'Seni Rupa', icon: '🎨' },
+  { id: 'dkv', nama: 'Desain Komunikasi Visual (DKV)', icon: '📐' },
+  { id: 'desain-produk', nama: 'Desain Produk', icon: '⚙️' },
+  { id: 'desain-interior', nama: 'Desain Interior', icon: '🏠' },
+  { id: 'arsitektur', nama: 'Arsitektur', icon: '🏛️' },
+  { id: 'fotografi', nama: 'Fotografi', icon: '📷' },
+  { id: 'game', nama: 'Pengembangan Game', icon: '🎮' },
+  { id: 'aplikasi', nama: 'Pengembang Aplikasi', icon: '📱' },
+  { id: 'film', nama: 'Film, Animasi & Video', icon: '🎬' },
+  { id: 'iklan', nama: 'Periklanan', icon: '📢' },
+  { id: 'penerbitan', nama: 'Penerbitan', icon: '📚' },
+  { id: 'tv-radio', nama: 'TV & Radio', icon: '📺' },
 ];
 
 const filteredProduk = computed(() => {
@@ -146,6 +161,7 @@ const filteredProduk = computed(() => {
 function resetFilter() {
   filterSektor.value = '';
   filterHaki.value = '';
+  searchQuery.value = '';
 }
 
 async function loadProduk() {

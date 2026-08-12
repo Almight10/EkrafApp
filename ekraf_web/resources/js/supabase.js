@@ -79,6 +79,11 @@ export function normalizeEkrafData(row) {
         row.identitas?.no_wa ||
         '';
 
+    const ownerPhoto =
+        (row.users?.foto_url && String(row.users.foto_url).trim()) ||
+        (row.identitas?.foto_url && String(row.identitas.foto_url).trim()) ||
+        '';
+
     const alamatStr = (row.alamat && String(row.alamat).trim()) || (row.users?.alamat && String(row.users.alamat).trim()) || '';
     const kecamatanStr = (row.kecamatan && String(row.kecamatan).trim()) || (row.users?.kecamatan && String(row.users.kecamatan).trim()) || '';
     const kelurahanStr = (row.kelurahan && String(row.kelurahan).trim()) || (row.users?.kelurahan && String(row.users.kelurahan).trim()) || '';
@@ -91,6 +96,7 @@ export function normalizeEkrafData(row) {
     if (row.usaha && typeof row.usaha === 'object') {
         return {
             ...row,
+            user_id: row.user_id || row.userId || '',
             usaha: {
                 ...row.usaha,
                 alamat: row.usaha.alamat || lokasiLengkap,
@@ -99,6 +105,7 @@ export function normalizeEkrafData(row) {
                 ...row.identitas,
                 nama_lengkap: ownerName,
                 no_wa: ownerPhone,
+                foto_url: ownerPhoto,
                 alamat: alamatStr,
                 kecamatan: kecamatanStr,
                 kelurahan: kelurahanStr,
@@ -109,6 +116,7 @@ export function normalizeEkrafData(row) {
     // Flat format from Android — map to nested web format
     return {
         id: row.id,
+        user_id: row.user_id || row.userId || '',
         status_verifikasi: row.status || row.status_verifikasi || 'pending',
         created_at: row.created_at || row.createdAt,
         usaha: {
@@ -129,6 +137,7 @@ export function normalizeEkrafData(row) {
         identitas: {
             nama_lengkap: ownerName,
             no_wa: ownerPhone,
+            foto_url: ownerPhoto,
             alamat: alamatStr,
             kecamatan: kecamatanStr,
             kelurahan: kelurahanStr,
@@ -191,6 +200,57 @@ function parseFotoUrls(val) {
         }
     }
     return [];
+}
+
+/**
+ * Resolve profile photo URL from Supabase Storage.
+ * Needed because public web clients cannot read users.foto_url (RLS).
+ */
+export async function resolveProfilePhotoUrl(userId) {
+    if (!userId || !isSupabaseConfigured) return '';
+
+    try {
+        const { data, error } = await supabase.storage
+            .from('profiles')
+            .list('foto_diri', {
+                search: String(userId),
+                limit: 5,
+                sortBy: { column: 'created_at', order: 'desc' },
+            });
+
+        if (error || !data?.length) return '';
+
+        const file = data.find((item) => item.name.startsWith(`${userId}_`)) || data[0];
+        if (!file?.name) return '';
+
+        const { data: urlData } = supabase.storage
+            .from('profiles')
+            .getPublicUrl(`foto_diri/${file.name}`);
+
+        return urlData?.publicUrl || '';
+    } catch {
+        return '';
+    }
+}
+
+export async function enrichOwnerProfilePhoto(item) {
+    if (!item?.identitas?.foto_url) {
+        const userId = item.user_id || item._raw?.user_id;
+        if (userId) {
+            const fotoUrl = await resolveProfilePhotoUrl(userId);
+            if (fotoUrl) {
+                return {
+                    ...item,
+                    identitas: {
+                        ...item.identitas,
+                        foto_url: fotoUrl,
+                    },
+                };
+            }
+        }
+    }
+
+    return item;
 }
 
 export default supabase;

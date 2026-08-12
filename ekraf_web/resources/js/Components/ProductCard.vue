@@ -36,28 +36,28 @@
       </p>
 
       <!-- HAKI Status Indicator Row -->
-      <div style="margin-top:0.875rem;">
+      <div class="card__haki-row" style="margin-top:0.6rem;">
         <!-- Has HAKI: Green verified chip -->
-        <div v-if="hasHaki" style="display:inline-flex;align-items:center;gap:6px;background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;padding:3px 10px;border-radius:2px;font-size:0.725rem;font-weight:700;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.04em;">
+        <div v-if="hasHaki" class="card__haki-chip card__haki-chip--verified">
           ✔ HAKI Terverifikasi
         </div>
         <!-- No HAKI: Muted gray chip -->
-        <div v-else style="display:inline-flex;align-items:center;gap:6px;background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db;padding:3px 10px;border-radius:2px;font-size:0.725rem;font-weight:600;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.04em;">
+        <div v-else class="card__haki-chip card__haki-chip--pending">
           ⏳ Belum HAKI
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.875rem; padding-top: 0.75rem; border-top: 1px solid var(--clr-border);">
-        <div style="font-family: var(--font-serif); font-weight: 700; color: var(--clr-terracotta); font-size: 1.05rem;">
+      <div class="card__footer">
+        <div class="card__price">
           {{ formattedPrice }}
         </div>
-        <div style="display: flex; gap: 6px; flex-shrink: 0;">
-          <button class="btn btn-outline btn-sm" @click.stop="goToDetail">Lihat Karya</button>
+        <div class="card__actions">
+          <button class="btn btn-outline btn-sm card__btn-detail" @click.stop="goToDetail">Lihat</button>
           <a
             :href="waLink"
             target="_blank"
             rel="noopener noreferrer"
-            class="btn btn-wa btn-sm"
+            class="btn btn-wa btn-sm card__btn-wa"
             @click.stop
             title="Pesan via WhatsApp"
           >

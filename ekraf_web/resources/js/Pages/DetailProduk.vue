@@ -87,6 +87,28 @@
           <!-- RIGHT: ARTISAN INFO & HAKI CERTIFICATE -->
           <div class="animate-in delay-100" style="display:flex;flex-direction:column;gap:1.5rem;">
 
+            <!-- FOTO PROFIL PELAKU USAHA -->
+            <div class="product-detail__owner">
+              <img
+                v-if="ownerPhoto && !hasOwnerPhotoError"
+                :src="ownerPhoto"
+                :alt="ownerName"
+                class="product-detail__owner-avatar"
+                @error="hasOwnerPhotoError = true"
+              />
+              <div
+                v-else
+                class="product-detail__owner-avatar product-detail__owner-avatar--placeholder"
+                aria-hidden="true"
+              >
+                {{ ownerInitial }}
+              </div>
+              <div>
+                <div class="product-detail__owner-label">Pelaku Usaha</div>
+                <div class="product-detail__owner-name">{{ ownerName }}</div>
+              </div>
+            </div>
+
             <!-- ARTISAN METADATA GRID (Screenshot 3) -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
               <div class="info-item">
@@ -201,7 +223,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { supabase, isSupabaseConfigured, normalizeEkrafData } from '../supabase.js';
+import { supabase, isSupabaseConfigured, normalizeEkrafData, enrichOwnerProfilePhoto } from '../supabase.js';
 import { dummyProducts, getDemoItemById, slugify } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
 
@@ -209,10 +231,24 @@ const loading = ref(true);
 const produk = ref(null);
 const activeImage = ref(null);
 const hasDetailImgError = ref(false);
+const hasOwnerPhotoError = ref(false);
 
 function onDetailImgError() {
   hasDetailImgError.value = true;
 }
+
+const ownerName = computed(() => {
+  return produk.value?.identitas?.nama_lengkap || 'Pelaku Ekraf';
+});
+
+const ownerPhoto = computed(() => {
+  return produk.value?.identitas?.foto_url || '';
+});
+
+const ownerInitial = computed(() => {
+  const name = ownerName.value.trim();
+  return name ? name.charAt(0).toUpperCase() : '?';
+});
 
 const subSektorIcons = {
   'kuliner': '🍽️', 'kriya': '🪡', 'fesyen': '👗', 'musik': '🎵',
@@ -270,7 +306,8 @@ async function loadDetail() {
   const targetSlug = slugify(param);
 
   if (!isSupabaseConfigured) {
-    produk.value = getDemoItemById(param);
+    produk.value = await enrichOwnerProfilePhoto(getDemoItemById(param));
+    hasOwnerPhotoError.value = false;
     if (produk.value && images.value.length > 0) {
       activeImage.value = images.value[0];
     }
@@ -282,7 +319,7 @@ async function loadDetail() {
     // 1. Fetch rows from Supabase ekraf_data table to match pure slug or ID
     const { data: list, error } = await supabase
       .from('ekraf_data')
-      .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)');
+      .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap, foto_url)');
 
     if (error) console.warn('[Ekraf] Supabase query notice:', error?.message || error);
 
@@ -321,7 +358,8 @@ async function loadDetail() {
     }
 
     if (matchedRow) {
-      produk.value = normalizeEkrafData(matchedRow);
+      produk.value = await enrichOwnerProfilePhoto(normalizeEkrafData(matchedRow));
+      hasOwnerPhotoError.value = false;
       if (images.value.length > 0) activeImage.value = images.value[0];
     } else {
       // Search demo items strictly
@@ -331,13 +369,16 @@ async function loadDetail() {
       });
 
       if (demoMatch) {
-        produk.value = demoMatch;
+        produk.value = await enrichOwnerProfilePhoto(demoMatch);
+        hasOwnerPhotoError.value = false;
         if (images.value.length > 0) activeImage.value = images.value[0];
       } else if (list && list.length > 0) {
-        produk.value = normalizeEkrafData(list[0]);
+        produk.value = await enrichOwnerProfilePhoto(normalizeEkrafData(list[0]));
+        hasOwnerPhotoError.value = false;
         if (images.value.length > 0) activeImage.value = images.value[0];
       } else {
-        produk.value = dummyProducts[0];
+        produk.value = await enrichOwnerProfilePhoto(dummyProducts[0]);
+        hasOwnerPhotoError.value = false;
       }
     }
   } catch (err) {
