@@ -50,21 +50,24 @@ $envVars = [
 ];
 
 foreach ($envVars as $key => $value) {
-    if (!getenv($key)) {
-        putenv("{$key}={$value}");
-    }
-    if (!isset($_ENV[$key])) {
-        $_ENV[$key] = $value;
-    }
-    if (!isset($_SERVER[$key])) {
-        $_SERVER[$key] = $value;
-    }
+    putenv("{$key}={$value}");
+    $_ENV[$key] = $value;
+    $_SERVER[$key] = $value;
 }
+
+putenv('APP_URL=https://ekraf-app.vercel.app');
+$_ENV['APP_URL'] = 'https://ekraf-app.vercel.app';
+$_SERVER['APP_URL'] = 'https://ekraf-app.vercel.app';
+
+putenv('ASSET_URL=https://ekraf-app.vercel.app');
+$_ENV['ASSET_URL'] = 'https://ekraf-app.vercel.app';
+$_SERVER['ASSET_URL'] = 'https://ekraf-app.vercel.app';
 
 $_SERVER['HTTPS'] = 'on';
 $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
 $_SERVER['HTTP_X_FORWARDED_PORT'] = 443;
 putenv('HTTPS=on');
+$_ENV['HTTPS'] = 'on';
 
 // Forward Vercel requests to Laravel public index
 require __DIR__ . '/../public/index.php';
