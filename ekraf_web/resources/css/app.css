@@ -470,52 +470,60 @@ a { text-decoration: none; color: inherit; }
   margin-top: 1.5rem;
 }
 
-/* ── HERO TIMED ANIMATED SHOWCASE CAROUSEL ── */
-.hero__showcase-card {
-  background: #ffffff;
-  padding: 10px 10px 14px 10px;
-  box-shadow: 6px 6px 0px rgba(28, 25, 23, 0.85), 0 0 0 1px var(--clr-charcoal);
-  border-radius: 4px;
-  cursor: pointer;
+/* Gallery Photo Stack Frame Effect */
+.hero__photo-stack {
   position: relative;
-  transition: transform 250ms ease, box-shadow 250ms ease;
   width: 100%;
-  max-width: 380px;
-  margin: 0 auto;
-}
-
-.hero__showcase-card:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 3px 3px 0px rgba(28, 25, 23, 0.85), 0 0 0 1px var(--clr-terracotta);
-}
-
-.hero__showcase-img-wrap {
-  width: 100%;
-  height: 240px;
-  overflow: hidden;
-  border-radius: 2px;
-  background: var(--clr-bg-alt);
-  position: relative;
-}
-
-.hero__showcase-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.hero__showcase-caption {
-  margin-top: 10px;
+  height: 380px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  justify-content: center;
+}
+
+.hero__photo-card {
+  position: absolute;
+  background: #ffffff;
+  padding: 10px 10px 24px 10px;
+  box-shadow: 4px 4px 0px rgba(28, 25, 23, 0.8), 0 0 0 1px var(--clr-charcoal);
+  border-radius: 4px;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  width: 230px;
+}
+
+.hero__photo-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--clr-bg-alt);
+}
+
+.hero__photo-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: var(--clr-haki-purple);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
+  z-index: 2;
+}
+
+.hero__photo-caption {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .hero__photo-title {
   font-family: var(--font-serif);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--clr-charcoal);
   white-space: nowrap;
@@ -530,69 +538,44 @@ a { text-decoration: none; color: inherit; }
   text-transform: uppercase;
 }
 
-.hero__photo-badge {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  background: var(--clr-haki-purple);
-  color: #ffffff;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
+.hero__photo-card--1 {
+  transform: rotate(6deg) translate(30px, -20px);
+  z-index: 3;
+}
+
+.hero__photo-card--1:hover {
+  transform: rotate(6deg) translate(33px, -17px);
+  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.8), 0 0 0 2px var(--clr-terracotta);
+  z-index: 10;
+}
+
+.hero__photo-card--2 {
+  transform: rotate(-8deg) translate(-40px, -40px);
   z-index: 2;
 }
 
-.hero__showcase-dots {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
+.hero__photo-card--2:hover {
+  transform: rotate(-8deg) translate(-37px, -37px);
+  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.8), 0 0 0 2px var(--clr-terracotta);
+  z-index: 10;
 }
 
-.hero__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--clr-border);
-  transition: all 250ms ease;
-  cursor: pointer;
+.hero__photo-card--3 {
+  transform: rotate(2deg) translate(-10px, 40px);
+  z-index: 1;
 }
 
-.hero__dot.active {
-  width: 20px;
-  border-radius: 10px;
-  background: var(--clr-terracotta);
+.hero__photo-card--3:hover {
+  transform: rotate(2deg) translate(-7px, 43px);
+  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.8), 0 0 0 2px var(--clr-terracotta);
+  z-index: 10;
 }
 
-/* Slide Fade Transition */
-.hero-slide-enter-active,
-.hero-slide-leave-active {
-  transition: opacity 350ms ease, transform 350ms ease;
-}
-
-.hero-slide-enter-from {
-  opacity: 0;
-  transform: scale(1.02) translateY(4px);
-}
-
-.hero-slide-leave-to {
-  opacity: 0;
-  transform: scale(0.98) translateY(-4px);
-}
-
-/* Showcase visibility across desktop and mobile */
-.hero__showcase-mobile {
+.hero__photo-stack--mobile {
   display: none;
-  margin: 1.25rem 0 1.5rem;
 }
-
-.hero__showcase-desktop {
+.hero__photo-stack--desktop {
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* STATS BANNER CONTAINER */
@@ -1247,20 +1230,35 @@ a { text-decoration: none; color: inherit; }
   .hero__actions {
     justify-content: center;
   }
-  .hero__photo-stack {
-    height: 280px;
-    margin-top: 1rem;
+  /* Hero Photo Stack Mobile Responsive */
+  .hero__photo-stack--desktop {
+    display: none !important;
+  }
+  .hero__photo-stack--mobile {
+    display: flex !important;
+    height: 320px;
+    margin: 1.5rem auto 2rem;
     max-width: 100%;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+  }
+  .hero__photo-card {
+    width: 200px;
+    padding: 8px 8px 18px 8px;
+  }
+  .hero__photo-card img {
+    height: 170px;
   }
   .hero__photo-card--1 {
-    transform: rotate(4deg) translate(15px, -10px);
+    transform: rotate(5deg) translate(18px, -12px);
   }
   .hero__photo-card--2 {
-    transform: rotate(-6deg) translate(-20px, -20px);
+    transform: rotate(-6deg) translate(-22px, -22px);
   }
   .hero__photo-card--3 {
-    transform: rotate(2deg) translate(0px, 30px);
+    transform: rotate(2deg) translate(-2px, 18px);
   }
 
   /* Compact 3-Column Stats Banner on Mobile */
@@ -1440,15 +1438,25 @@ a { text-decoration: none; color: inherit; }
   .navbar__brand-badge {
     font-size: 0.55rem;
   }
+  .hero__photo-stack--mobile {
+    height: 290px;
+    margin: 1.25rem auto 2.25rem;
+  }
   .hero__photo-card {
-    width: 180px;
-    padding: 6px 6px 16px 6px;
+    width: 185px;
+    padding: 7px 7px 18px 7px;
   }
   .hero__photo-card img {
-    height: 150px;
+    height: 155px;
   }
-  .hero__photo-stack {
-    height: 250px;
+  .hero__photo-card--1 {
+    transform: rotate(4deg) translate(12px, -8px);
+  }
+  .hero__photo-card--2 {
+    transform: rotate(-5deg) translate(-18px, -16px);
+  }
+  .hero__photo-card--3 {
+    transform: rotate(2deg) translate(-1px, 12px);
   }
   .product-detail__title {
     font-size: 1.5rem;

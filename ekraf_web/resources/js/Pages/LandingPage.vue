@@ -4,7 +4,7 @@
     <section class="hero">
       <div class="container">
         <div class="hero__inner">
-          <!-- Left: Headlines, Mobile Showcase & CTAs -->
+          <!-- Left: Headlines, Mobile Photo Stack, & CTAs -->
           <div class="animate-in hero__content">
             <h1 class="display-xl" style="margin:0 0 1.25rem;">
               Rayakan <span class="serif-italic">Kreativitas</span><br>Anak Bangsa
@@ -13,36 +13,24 @@
               Platform digital premium untuk mengeksplorasi, mengoleksi, dan merayakan karya terbaik dari 17 sub-sektor ekonomi kreatif Indonesia berbasis Hak Kekayaan Intelektual.
             </p>
 
-            <!-- TIMED ARTWORK SHOWCASE SLIDER (MOBILE VIEW POSITIONED BEFORE CTAS) -->
-            <div class="hero__showcase-mobile animate-in delay-100">
-              <div v-if="activeCard" class="hero__showcase-card" @click="openCardDetail(activeCard)">
-                <div v-if="activeCard.haki" class="hero__photo-badge">✓ HAKI</div>
-                <div class="hero__showcase-img-wrap">
-                  <transition name="hero-slide" mode="out-in">
-                    <img
-                      :key="activeCard.id || currentSlide"
-                      :src="activeCard.image"
-                      :alt="activeCard.title"
-                      class="hero__showcase-img"
-                      @error="onHeroImgError($event, currentSlide)"
-                    />
-                  </transition>
-                </div>
-                <div class="hero__showcase-caption">
-                  <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">
-                    <div class="hero__photo-title">{{ activeCard.title }}</div>
-                    <div class="hero__photo-sub">{{ activeCard.subSektor }} • Karya Pilihan</div>
-                  </div>
-                  <!-- Slide dots -->
-                  <div class="hero__showcase-dots">
-                    <span
-                      v-for="(c, idx) in heroCards"
-                      :key="idx"
-                      class="hero__dot"
-                      :class="{ active: currentSlide === idx }"
-                      @click.stop="currentSlide = idx"
-                    ></span>
-                  </div>
+            <!-- POLAROID PHOTO STACK (MOBILE VIEW - POSITIONED BETWEEN DESCRIPTION & CTAS) -->
+            <div class="hero__photo-stack hero__photo-stack--mobile animate-in delay-200">
+              <div
+                v-for="(card, idx) in heroCards"
+                :key="card.id || idx"
+                :class="['hero__photo-card', `hero__photo-card--${idx + 1}`]"
+                @click="openCardDetail(card)"
+                :title="`Lihat detail ${card.title}`"
+              >
+                <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
+                <img
+                  :src="card.image"
+                  :alt="card.title"
+                  @error="onHeroImgError($event, idx)"
+                />
+                <div class="hero__photo-caption">
+                  <span class="hero__photo-title">{{ card.title }}</span>
+                  <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
                 </div>
               </div>
             </div>
@@ -54,36 +42,24 @@
             </div>
           </div>
 
-          <!-- Right: Desktop Timed Showcase Card -->
-          <div class="hero__showcase-desktop animate-in delay-200">
-            <div v-if="activeCard" class="hero__showcase-card hero__showcase-card--desktop" @click="openCardDetail(activeCard)">
-              <div v-if="activeCard.haki" class="hero__photo-badge">✓ HAKI Terverifikasi</div>
-              <div class="hero__showcase-img-wrap">
-                <transition name="hero-slide" mode="out-in">
-                  <img
-                    :key="activeCard.id || currentSlide"
-                    :src="activeCard.image"
-                    :alt="activeCard.title"
-                    class="hero__showcase-img"
-                    @error="onHeroImgError($event, currentSlide)"
-                  />
-                </transition>
-              </div>
-              <div class="hero__showcase-caption">
-                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">
-                  <div class="hero__photo-title">{{ activeCard.title }}</div>
-                  <div class="hero__photo-sub">{{ activeCard.subSektor }} • 2026</div>
-                </div>
-                <!-- Slide dots -->
-                <div class="hero__showcase-dots">
-                  <span
-                    v-for="(c, idx) in heroCards"
-                    :key="idx"
-                    class="hero__dot"
-                    :class="{ active: currentSlide === idx }"
-                    @click.stop="currentSlide = idx"
-                  ></span>
-                </div>
+          <!-- Right: Desktop Gallery Polaroid Photo Stack -->
+          <div class="hero__photo-stack hero__photo-stack--desktop animate-in delay-200">
+            <div
+              v-for="(card, idx) in heroCards"
+              :key="card.id || idx"
+              :class="['hero__photo-card', `hero__photo-card--${idx + 1}`]"
+              @click="openCardDetail(card)"
+              :title="`Lihat detail ${card.title}`"
+            >
+              <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
+              <img
+                :src="card.image"
+                :alt="card.title"
+                @error="onHeroImgError($event, idx)"
+              />
+              <div class="hero__photo-caption">
+                <span class="hero__photo-title">{{ card.title }}</span>
+                <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
               </div>
             </div>
           </div>
