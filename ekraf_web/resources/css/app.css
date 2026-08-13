@@ -863,14 +863,13 @@ a { text-decoration: none; color: inherit; }
   outline: none;
   background: var(--clr-bg);
   box-shadow: 2px 2px 0px rgba(28, 25, 23, 0.15);
-  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  transition: box-shadow 150ms ease, border-color 150ms ease, background 150ms ease;
 }
 
 .search-input:focus, .search-input:hover {
   border-color: var(--clr-terracotta);
   background: #ffffff;
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.15);
+  box-shadow: 2px 2px 0px rgba(192, 72, 40, 0.2);
 }
 
 .search-icon {
