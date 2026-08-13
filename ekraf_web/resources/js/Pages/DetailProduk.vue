@@ -26,7 +26,7 @@
       </div>
 
       <div class="container" style="padding:3rem 1.5rem 5rem;">
-        <!-- HEADER TITLE & HAKI STAMP -->
+        <!-- HEADER TITLE -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
           <div>
             <h1 class="display-xl" style="margin:0 0 0.5rem;">
@@ -36,9 +36,6 @@
               <span class="badge badge-accent">{{ produk.usaha?.sub_sektor_id || 'Ekraf' }}</span>
               <!-- <span style="color:var(--clr-muted);font-size:0.95rem;">📍 {{ produk.usaha?.alamat || 'Kota Probolinggo' }}</span> -->
             </div>
-          </div>
-          <div v-if="hasHaki" class="haki-stamp" style="width:54px;height:54px;font-size:1.5rem;box-shadow:0 4px 14px rgba(139,92,246,0.4);" title="Bersertifikat HAKI Resmi">
-            ✓
           </div>
         </div>
 
@@ -126,7 +123,7 @@
               </div>
 
               <!-- Bottom Row: Lokasi -->
-              <div class="owner-card__bottom">
+              <div class="owner-card__bottom" style="background:#ffffff;">
                 <div class="product-detail__owner-avatar product-detail__owner-avatar--location" aria-hidden="true">
                   📍
                 </div>
