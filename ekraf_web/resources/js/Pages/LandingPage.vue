@@ -14,23 +14,29 @@
             </p>
 
             <!-- POLAROID PHOTO STACK (MOBILE VIEW - POSITIONED BETWEEN DESCRIPTION & CTAS) -->
-            <div class="hero__photo-stack hero__photo-stack--mobile animate-in delay-200">
+            <div class="hero__photo-stack-wrap hero__photo-stack--mobile animate-in delay-200">
               <div
-                v-for="(card, idx) in heroCards"
-                :key="card.id || idx"
-                :class="['hero__photo-card', `hero__photo-card--${idx + 1}`]"
-                @click="openCardDetail(card)"
-                :title="`Lihat detail ${card.title}`"
+                class="hero__photo-stack"
+                @mouseenter="stopTimer"
+                @mouseleave="startTimer"
               >
-                <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
-                <img
-                  :src="card.image"
-                  :alt="card.title"
-                  @error="onHeroImgError($event, idx)"
-                />
-                <div class="hero__photo-caption">
-                  <span class="hero__photo-title">{{ card.title }}</span>
-                  <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
+                <div
+                  v-for="(card, idx) in heroCards"
+                  :key="card.id || idx"
+                  :class="['hero__photo-card', getCardSlotClass(idx)]"
+                  @click="handleCardClick(card, idx)"
+                  :title="getCardSlotClass(idx) === 'hero__photo-card--slot-front' ? `Lihat detail ${card.title}` : `Tampilkan ${card.title} ke depan`"
+                >
+                  <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
+                  <img
+                    :src="card.image"
+                    :alt="card.title"
+                    @error="onHeroImgError($event, idx)"
+                  />
+                  <div class="hero__photo-caption">
+                    <span class="hero__photo-title">{{ card.title }}</span>
+                    <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -43,23 +49,29 @@
           </div>
 
           <!-- Right: Desktop Gallery Polaroid Photo Stack -->
-          <div class="hero__photo-stack hero__photo-stack--desktop animate-in delay-200">
+          <div class="hero__photo-stack-wrap hero__photo-stack--desktop animate-in delay-200">
             <div
-              v-for="(card, idx) in heroCards"
-              :key="card.id || idx"
-              :class="['hero__photo-card', `hero__photo-card--${idx + 1}`]"
-              @click="openCardDetail(card)"
-              :title="`Lihat detail ${card.title}`"
+              class="hero__photo-stack"
+              @mouseenter="stopTimer"
+              @mouseleave="startTimer"
             >
-              <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
-              <img
-                :src="card.image"
-                :alt="card.title"
-                @error="onHeroImgError($event, idx)"
-              />
-              <div class="hero__photo-caption">
-                <span class="hero__photo-title">{{ card.title }}</span>
-                <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
+              <div
+                v-for="(card, idx) in heroCards"
+                :key="card.id || idx"
+                :class="['hero__photo-card', getCardSlotClass(idx)]"
+                @click="handleCardClick(card, idx)"
+                :title="getCardSlotClass(idx) === 'hero__photo-card--slot-front' ? `Lihat detail ${card.title}` : `Tampilkan ${card.title} ke depan`"
+              >
+                <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
+                <img
+                  :src="card.image"
+                  :alt="card.title"
+                  @error="onHeroImgError($event, idx)"
+                />
+                <div class="hero__photo-caption">
+                  <span class="hero__photo-title">{{ card.title }}</span>
+                  <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
+                </div>
               </div>
             </div>
           </div>
@@ -199,7 +211,7 @@ let slideTimer = null;
 
 const heroCards = computed(() => {
   const list = newArrivals.value.length > 0 ? newArrivals.value : dummyProducts;
-  return list.slice(0, 5).map((item, idx) => ({
+  return list.slice(0, 3).map((item, idx) => ({
     id: item.id,
     title: item.usaha?.nama_usaha || 'Karya Ekraf',
     subSektor: item.usaha?.sub_sektor_id || 'kriya',
@@ -227,6 +239,21 @@ function stopTimer() {
   if (slideTimer) clearInterval(slideTimer);
 }
 
+function getCardSlotClass(idx) {
+  const total = heroCards.value.length;
+  if (!total) return 'hero__photo-card--slot-front';
+  const rel = (idx - (currentSlide.value % total) + total) % total;
+  if (rel === 0) return 'hero__photo-card--slot-front';
+  if (rel === 1) return 'hero__photo-card--slot-right';
+  if (rel === 2) return 'hero__photo-card--slot-left';
+  return 'hero__photo-card--slot-hidden';
+}
+
+function setSlide(idx) {
+  currentSlide.value = idx;
+  startTimer();
+}
+
 const fallbackArtworks = [
   'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=800&q=80',
@@ -244,6 +271,19 @@ function openCardDetail(card) {
     router.visit(`/detail/${encodeURIComponent(slug)}`);
   } else {
     router.visit('/katalog');
+  }
+}
+
+function handleCardClick(card, idx) {
+  const slotClass = getCardSlotClass(idx);
+  console.log('[Card Click] idx:', idx, 'slot:', slotClass, 'currentSlide:', currentSlide.value);
+  if (slotClass === 'hero__photo-card--slot-front') {
+    openCardDetail(card);
+  } else {
+    currentSlide.value = idx;
+    stopTimer();
+    setTimeout(() => startTimer(), 100);
+    console.log('[Card Click] new currentSlide:', currentSlide.value);
   }
 }
 

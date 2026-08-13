@@ -470,26 +470,24 @@ a { text-decoration: none; color: inherit; }
   margin-top: 1.5rem;
 }
 
-/* Gallery Photo Stack Frame Effect */
+/* Gallery Photo Stack Frame Effect & Automatic Animations */
+.hero__photo-stack-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
 .hero__photo-stack {
   position: relative;
   width: 100%;
-  height: 380px;
+  height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.hero__photo-card {
-  position: absolute;
-  background: #ffffff;
-  padding: 10px 10px 24px 10px;
-  box-shadow: 4px 4px 0px rgba(28, 25, 23, 0.8), 0 0 0 1px var(--clr-charcoal);
-  border-radius: 4px;
-  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  width: 230px;
-}
+
 
 .hero__photo-card img {
   width: 100%;
@@ -514,6 +512,88 @@ a { text-decoration: none; color: inherit; }
   z-index: 2;
 }
 
+/* ============================================================
+   Photo Card Slot System — Transition-based (no fill-mode issues)
+   Slot position defined via transform. Vue class change → CSS transition animates it.
+   Floating effect via separate `top` offset animation (doesn't conflict with transform).
+   ============================================================ */
+
+/* Base card: smooth transition when slot class changes */
+.hero__photo-card {
+  position: absolute;
+  background: #ffffff;
+  padding: 10px 10px 24px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 230px;
+  top: 0;
+  /* Smooth slot position transitions */
+  transition: transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 350ms ease,
+              opacity 400ms ease,
+              top 4s ease-in-out;
+  /* Subtle floating: animate top offset so it doesn't fight with transform */
+  animation: heroCardFloatY 4s ease-in-out infinite alternate;
+}
+
+/* SLOT FRONT */
+.hero__photo-card--slot-front {
+  transform: rotate(-1.5deg) translate(0px, 0px) scale(1.04);
+  z-index: 10;
+  box-shadow: 6px 12px 24px rgba(28, 25, 23, 0.22), 0 0 0 2px var(--clr-terracotta);
+  animation-duration: 3.8s;
+  animation-delay: 0s;
+}
+
+/* SLOT RIGHT (middle card) */
+.hero__photo-card--slot-right {
+  transform: rotate(6deg) translate(52px, -16px) scale(0.96);
+  z-index: 5;
+  box-shadow: 4px 6px 16px rgba(28, 25, 23, 0.15), 0 0 0 1px var(--clr-charcoal);
+  animation-duration: 4.5s;
+  animation-delay: -1.3s;
+}
+
+/* SLOT LEFT (back card) */
+.hero__photo-card--slot-left {
+  transform: rotate(-8deg) translate(-50px, -30px) scale(0.91);
+  z-index: 2;
+  box-shadow: 2px 4px 12px rgba(28, 25, 23, 0.12), 0 0 0 1px var(--clr-charcoal);
+  animation-duration: 4.2s;
+  animation-delay: -2.6s;
+}
+
+/* HIDDEN (extra cards) */
+.hero__photo-card--slot-hidden {
+  transform: rotate(0deg) translate(0px, -60px) scale(0.75);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  animation: none;
+}
+
+/* Front card hover: gentle lift */
+.hero__photo-card--slot-front:hover {
+  transform: rotate(-1.5deg) translate(0px, -8px) scale(1.07) !important;
+  box-shadow: 8px 18px 36px rgba(28, 25, 23, 0.28), 0 0 0 2.5px var(--clr-terracotta) !important;
+}
+
+/* Back cards hover: only border highlight, NO transform change to avoid flicker */
+.hero__photo-card--slot-right:hover {
+  box-shadow: 4px 8px 22px rgba(28, 25, 23, 0.2), 0 0 0 2px var(--clr-terracotta);
+}
+.hero__photo-card--slot-left:hover {
+  box-shadow: 2px 6px 18px rgba(28, 25, 23, 0.17), 0 0 0 2px var(--clr-terracotta);
+}
+
+/* Floating keyframe — uses TOP offset, never conflicts with transform */
+@keyframes heroCardFloatY {
+  0%   { top: 0px; }
+  40%  { top: -10px; }
+  70%  { top: -5px; }
+  100% { top: -14px; }
+}
+
 .hero__photo-caption {
   margin-top: 8px;
   display: flex;
@@ -536,39 +616,6 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.68rem;
   color: var(--clr-muted);
   text-transform: uppercase;
-}
-
-.hero__photo-card--1 {
-  transform: rotate(6deg) translate(30px, -20px);
-  z-index: 3;
-}
-
-.hero__photo-card--1:hover {
-  transform: rotate(6deg) translate(33px, -17px);
-  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.8), 0 0 0 2px var(--clr-terracotta);
-  z-index: 10;
-}
-
-.hero__photo-card--2 {
-  transform: rotate(-8deg) translate(-40px, -40px);
-  z-index: 2;
-}
-
-.hero__photo-card--2:hover {
-  transform: rotate(-8deg) translate(-37px, -37px);
-  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.8), 0 0 0 2px var(--clr-terracotta);
-  z-index: 10;
-}
-
-.hero__photo-card--3 {
-  transform: rotate(2deg) translate(-10px, 40px);
-  z-index: 1;
-}
-
-.hero__photo-card--3:hover {
-  transform: rotate(2deg) translate(-7px, 43px);
-  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.8), 0 0 0 2px var(--clr-terracotta);
-  z-index: 10;
 }
 
 .hero__photo-stack--mobile {
