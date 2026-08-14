@@ -1349,12 +1349,12 @@ a { text-decoration: none; color: inherit; }
   .hero__photo-stack--mobile {
     display: flex !important;
     width: 100%;
-    margin: 5rem auto 2.5rem;
+    margin: 1.5rem auto 1.5rem;
     justify-content: center;
     align-items: center;
   }
   .hero__photo-stack--mobile .hero__photo-stack {
-    height: 290px !important;
+    height: 350px !important;
     position: relative;
     width: 100%;
     display: flex;
@@ -1364,9 +1364,24 @@ a { text-decoration: none; color: inherit; }
   .hero__photo-card {
     width: 190px;
     padding: 8px 8px 18px 8px;
+    top: 50%;
+    animation: none; /* disable float animation on mobile — it overrides top: 50% */
   }
   .hero__photo-card img {
     height: 160px;
+  }
+  /* Mobile: each slot needs translateY(-50%) to center from top:50% base */
+  .hero__photo-card--slot-front {
+    transform: rotate(-1.5deg) translateX(0px) translateY(-50%) scale(1.04);
+  }
+  .hero__photo-card--slot-right {
+    transform: rotate(6deg) translateX(46px) translateY(calc(-50% - 16px)) scale(0.96);
+  }
+  .hero__photo-card--slot-left {
+    transform: rotate(-8deg) translateX(-44px) translateY(calc(-50% - 30px)) scale(0.91);
+  }
+  .hero__photo-card--slot-front:hover {
+    transform: rotate(-1.5deg) translateX(0px) translateY(calc(-50% - 8px)) scale(1.07) !important;
   }
 
   /* Compact 3-Column Stats Banner on Mobile */
