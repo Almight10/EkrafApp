@@ -40,8 +40,7 @@
                 class="product-gallery__main"
                 @error="onDetailImgError"
               />
-              <div v-else style="height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;font-size:3.5rem;background:var(--clr-bg-alt);border-radius:2px;color:var(--clr-terracotta);">
-                <span>{{ sektorIcon }}</span>
+              <div v-else style="height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;background:var(--clr-bg-alt);border-radius:2px;color:var(--clr-terracotta);">
                 <span style="font-size:0.875rem;font-family:var(--font-mono);color:var(--clr-muted);font-weight:600;">Karya {{ produk.usaha?.sub_sektor_id || 'Ekraf' }}</span>
               </div>
             </div>
@@ -250,19 +249,6 @@ const ownerPhoto = computed(() => {
 const ownerInitial = computed(() => {
   const name = ownerName.value.trim();
   return name ? name.charAt(0).toUpperCase() : '?';
-});
-
-const subSektorIcons = {
-  'kuliner': '🍽️', 'kriya': '🪡', 'fesyen': '👗', 'musik': '🎵',
-  'seni-pertunjukan': '🎭', 'seni-rupa': '🖼️', 'dkv': '🎨',
-  'desain-produk': '⚙️', 'desain-interior': '🏠', 'arsitektur': '🏛️',
-  'fotografi': '📷', 'aplikasi-game': '🎮', 'game': '🎮', 'aplikasi': '📱', 'film': '🎬',
-  'periklanan': '📢', 'iklan': '📢', 'penerbitan': '📚', 'tv-radio': '📺', 'lainnya': '✨'
-};
-
-const sektorIcon = computed(() => {
-  const id = produk.value?.usaha?.sub_sektor_id;
-  return subSektorIcons[id] || '🎨';
 });
 
 const titleFirst = computed(() => {
