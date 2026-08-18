@@ -9,6 +9,7 @@
             <p style="color:var(--clr-muted);font-size:0.95rem;margin:0;">Jelajahi dan apresiasi portofolio karya kreatif terverifikasi HAKI seluruh daerah.</p>
           </div>
           <div class="search-wrap">
+            <span class="search-icon">🔍</span>
             <input
               v-model="searchQuery"
               type="text"
@@ -71,7 +72,6 @@
       </div>
 
       <div v-else-if="filteredProduk.length === 0" class="empty-state">
-        <div class="empty-state__icon">🔍</div>
         <h3 style="color:var(--clr-charcoal);margin:0 0 0.5rem;font-family:var(--font-serif);">Tidak ada karya ditemukan</h3>
         <p style="margin-bottom:1.5rem;">Coba sesuaikan kata kunci atau filter sub-sektor Anda.</p>
         <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
