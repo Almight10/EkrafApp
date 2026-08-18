@@ -116,10 +116,10 @@
             </div>
           </div>
 
-          <!-- Fesyen Card (Yellow) -->
+          <!-- Fashion Card (Yellow) -->
           <div class="bento-card bento-card--fesyen" @click="goToKatalog('fesyen')">
             <div>
-              <h3 class="bento-card__title">Fesyen</h3>
+              <h3 class="bento-card__title">Fashion</h3>
               <p class="bento-card__desc" style="color:var(--clr-charcoal);">Batik, tenun & rancangan busana modern.</p>
             </div>
           </div>
@@ -140,15 +140,15 @@
             </div>
           </div>
 
-          <!-- Film & Animasi Card (White) -->
+          <!-- Film, Animasi & Video Card (White) -->
           <div class="bento-card bento-card--film" @click="goToKatalog('film')">
             <div>
-              <h3 class="bento-card__title">Film & Animasi</h3>
+              <h3 class="bento-card__title">Film, Animasi & Video</h3>
               <p class="bento-card__desc">Karya audio visual bereputasi.</p>
             </div>
           </div>
 
-          <!-- +12 Lainnya (Dark Teal) -->
+          <!-- +12 Sektor Lainnya (Dark Teal) -->
           <div class="bento-card bento-card--more" @click="goToKatalog('')">
             +12 Sektor Lainnya →
           </div>
