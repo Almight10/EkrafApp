@@ -200,6 +200,7 @@ const paginatedProduk = computed(() => {
 function goToPage(page) {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
+    updateUrlParams();
     if (typeof window !== 'undefined') {
       const container = document.querySelector('.katalog-grid-container');
       if (container) {
@@ -209,8 +210,37 @@ function goToPage(page) {
   }
 }
 
+function updateUrlParams() {
+  if (typeof window === 'undefined') return;
+
+  const params = new URLSearchParams();
+
+  if (filterSektor.value) {
+    params.set('sektor', filterSektor.value);
+  }
+  if (filterHaki.value) {
+    params.set('haki', filterHaki.value);
+  }
+  if (searchQuery.value) {
+    params.set('q', searchQuery.value);
+  }
+  if (currentPage.value > 1) {
+    params.set('page', currentPage.value.toString());
+  }
+
+  const queryString = params.toString();
+  const newPath = window.location.pathname + (queryString ? `?${queryString}` : '');
+  
+  window.history.replaceState({}, '', newPath);
+}
+
 watch([searchQuery, filterSektor, filterHaki], () => {
   currentPage.value = 1;
+  updateUrlParams();
+});
+
+watch(currentPage, () => {
+  updateUrlParams();
 });
 
 function resetFilter() {
@@ -218,13 +248,23 @@ function resetFilter() {
   filterHaki.value = '';
   searchQuery.value = '';
   currentPage.value = 1;
+  updateUrlParams();
 }
 
 async function loadProduk() {
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
     const sektorParam = params.get('sektor');
+    const hakiParam = params.get('haki');
+    const qParam = params.get('q');
+    const pageParam = params.get('page');
+
     if (sektorParam) filterSektor.value = sektorParam;
+    if (hakiParam) filterHaki.value = hakiParam;
+    if (qParam) searchQuery.value = qParam;
+    if (pageParam && !isNaN(parseInt(pageParam))) {
+      currentPage.value = Math.max(1, parseInt(pageParam));
+    }
   }
 
   if (!isSupabaseConfigured) {
