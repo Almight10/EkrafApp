@@ -6,21 +6,21 @@
     <!-- NAVBAR (Editorial Gallery Header) -->
     <nav class="navbar">
       <div class="container navbar__inner">
-        <Link href="/" class="navbar__brand" @click="closeMobileMenu">
+        <a href="/" class="navbar__brand" @click="closeMobileMenu">
           <span>Kreasi</span>
           <span class="navbar__brand-badge">EKRAF Probolinggo</span>
-        </Link>
+        </a>
 
         <!-- Desktop Navigation Links -->
         <ul class="navbar__links navbar__links--desktop">
-          <li><Link href="/" :class="{ active: currentPath === '/' }">Beranda</Link></li>
-          <li><Link href="/katalog" :class="{ active: currentPath.startsWith('/katalog') }">Katalog Karya</Link></li>
+          <li><a href="/" :class="{ active: currentPath === '/' || currentPath === '' }">Beranda</a></li>
+          <li><a href="/katalog" :class="{ active: currentPath.startsWith('/katalog') }">Katalog Karya</a></li>
         </ul>
 
         <!-- Desktop Actions -->
         <div class="navbar__actions--desktop">
           <!-- <button @click="testLoading" class="btn btn-outline btn-sm" title="Uji Coba Animasi Loading">Preview Loading</button> -->
-          <Link href="/katalog" class="btn btn-primary btn-sm">Cari Karya</Link>
+          <a href="/katalog" class="btn btn-primary btn-sm">Cari Karya</a>
         </div>
 
         <!-- Mobile Hamburger Toggle Button -->
@@ -42,28 +42,28 @@
       <transition name="mobile-menu-slide">
         <div v-if="isMobileMenuOpen" class="mobile-drawer">
           <div class="mobile-drawer__links">
-            <Link
+            <a
               href="/"
-              :class="{ active: currentPath === '/' }"
+              :class="{ active: currentPath === '/' || currentPath === '' }"
               @click="closeMobileMenu"
               class="mobile-drawer__link"
             >
               <span>Beranda</span>
-            </Link>
-            <Link
+            </a>
+            <a
               href="/katalog"
               :class="{ active: currentPath.startsWith('/katalog') }"
               @click="closeMobileMenu"
               class="mobile-drawer__link"
             >
               <span>Katalog Karya</span>
-            </Link>
+            </a>
           </div>
 
           <div class="mobile-drawer__actions">
-            <Link href="/katalog" @click="closeMobileMenu" class="btn btn-primary btn-lg" style="width: 100%; text-align: center;">
+            <a href="/katalog" @click="closeMobileMenu" class="btn btn-primary btn-lg" style="width: 100%; text-align: center;">
               Cari Karya
-            </Link>
+            </a>
           </div>
         </div>
       </transition>
@@ -93,10 +93,10 @@
         <div>
           <div style="font-family:var(--font-mono);font-weight:700;font-size:0.75rem;text-transform:uppercase;color:var(--clr-charcoal);margin-bottom:0.75rem;">Sub-Sektor Utama</div>
           <ul class="footer__links">
-            <li><Link href="/katalog?sektor=kuliner">Kuliner Nusantara</Link></li>
-            <li><Link href="/katalog?sektor=kriya">Kriya & Craft</Link></li>
-            <li><Link href="/katalog?sektor=fesyen">Fesyen & Woven</Link></li>
-            <li><Link href="/katalog?sektor=seni-rupa">Seni Rupa & Visual</Link></li>
+            <li><a href="/katalog?sektor=kuliner">Kuliner Nusantara</a></li>
+            <li><a href="/katalog?sektor=kriya">Kriya & Craft</a></li>
+            <li><a href="/katalog?sektor=fesyen">Fesyen & Woven</a></li>
+            <li><a href="/katalog?sektor=seni-rupa">Seni Rupa & Visual</a></li>
           </ul>
         </div>
         <div>
