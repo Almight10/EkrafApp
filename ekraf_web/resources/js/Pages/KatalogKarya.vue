@@ -79,15 +79,54 @@
         </div>
       </div>
 
-      <div v-else class="grid-catalog">
-        <ProductCard v-for="produk in filteredProduk" :key="produk.id" :produk="produk" />
+      <div v-else>
+        <div class="grid-catalog">
+          <ProductCard v-for="produk in paginatedProduk" :key="produk.id" :produk="produk" />
+        </div>
+
+        <!-- PAGINATION CONTROLS BANNER -->
+        <div v-if="totalPages > 1" class="pagination-wrap">
+          <div class="pagination-info">
+            Menampilkan {{ startItemIndex }}–{{ endItemIndex }} dari {{ filteredProduk.length }} karya
+          </div>
+
+          <div class="pagination-controls">
+            <button
+              class="page-num-btn"
+              :disabled="currentPage === 1"
+              @click="goToPage(currentPage - 1)"
+              title="Halaman Sebelumnya"
+            >
+              ← Prev
+            </button>
+
+            <button
+              v-for="p in totalPages"
+              :key="p"
+              class="page-num-btn"
+              :class="{ active: currentPage === p }"
+              @click="goToPage(p)"
+            >
+              {{ p }}
+            </button>
+
+            <button
+              class="page-num-btn"
+              :disabled="currentPage === totalPages"
+              @click="goToPage(currentPage + 1)"
+              title="Halaman Selanjutnya"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </MainLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { supabase, isSupabaseConfigured, normalizeEkrafData, isApprovedEkrafData } from '../supabase.js';
 import { dummyProducts } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
@@ -99,6 +138,9 @@ const filterSektor = ref('');
 const filterHaki = ref('');
 const loading = ref(true);
 const produkList = ref([]);
+
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
 
 const subSektors = [
   { id: 'kuliner', nama: 'Kuliner'},
@@ -137,10 +179,45 @@ const filteredProduk = computed(() => {
   });
 });
 
+const totalPages = computed(() => {
+  return Math.ceil(filteredProduk.value.length / itemsPerPage.value) || 1;
+});
+
+const startItemIndex = computed(() => {
+  if (filteredProduk.value.length === 0) return 0;
+  return (currentPage.value - 1) * itemsPerPage.value + 1;
+});
+
+const endItemIndex = computed(() => {
+  return Math.min(currentPage.value * itemsPerPage.value, filteredProduk.value.length);
+});
+
+const paginatedProduk = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  return filteredProduk.value.slice(start, start + itemsPerPage.value);
+});
+
+function goToPage(page) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+    if (typeof window !== 'undefined') {
+      const container = document.querySelector('.katalog-grid-container');
+      if (container) {
+        container.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+}
+
+watch([searchQuery, filterSektor, filterHaki], () => {
+  currentPage.value = 1;
+});
+
 function resetFilter() {
   filterSektor.value = '';
   filterHaki.value = '';
   searchQuery.value = '';
+  currentPage.value = 1;
 }
 
 async function loadProduk() {

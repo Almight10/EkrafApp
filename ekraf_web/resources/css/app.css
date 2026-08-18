@@ -938,6 +938,69 @@ a { text-decoration: none; color: inherit; }
   color: var(--clr-muted);
 }
 
+/* ── PAGINATION CONTROLS ── */
+.pagination-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--clr-border);
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--clr-muted);
+  font-weight: 600;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.page-num-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 0.65rem;
+  border-radius: 2px;
+  border: 1px solid var(--clr-charcoal);
+  background: #ffffff;
+  color: var(--clr-charcoal);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px rgba(28, 25, 23, 0.15);
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-num-btn:hover:not(:disabled) {
+  background: var(--clr-bg-alt);
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px rgba(28, 25, 23, 0.15);
+}
+
+.page-num-btn.active {
+  background: var(--clr-terracotta);
+  color: #ffffff;
+  border-color: var(--clr-charcoal);
+  box-shadow: 2px 2px 0px rgba(28, 25, 23, 0.8);
+}
+
+.page-num-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 /* Card Responsive Helper Classes */
 .card__haki-chip {
   display: inline-flex;
