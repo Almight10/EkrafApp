@@ -22,7 +22,7 @@
               {{ titleFirst }} <span class="serif-italic">{{ titleRest }}</span>
             </h1>
             <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.5rem;flex-wrap:wrap;">
-              <span class="badge badge-accent">{{ produk.usaha?.sub_sektor_id || 'Ekraf' }}</span>
+              <span class="badge badge-accent">{{ sektorName }}</span>
               <!-- <span style="color:var(--clr-muted);font-size:0.95rem;">📍 {{ produk.usaha?.alamat || 'Kota Probolinggo' }}</span> -->
             </div>
           </div>
@@ -41,7 +41,7 @@
                 @error="onDetailImgError"
               />
               <div v-else style="height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;background:var(--clr-bg-alt);border-radius:2px;color:var(--clr-terracotta);">
-                <span style="font-size:0.875rem;font-family:var(--font-mono);color:var(--clr-muted);font-weight:600;">Karya {{ produk.usaha?.sub_sektor_id || 'Ekraf' }}</span>
+                <span style="font-size:0.875rem;font-family:var(--font-mono);color:var(--clr-muted);font-weight:600;">Karya {{ sektorName }}</span>
               </div>
             </div>
 
@@ -237,6 +237,35 @@ const hasOwnerPhotoError = ref(false);
 function onDetailImgError() {
   hasDetailImgError.value = true;
 }
+
+const subSektorNames = {
+  'aplikasi-game': 'Aplikasi & Game Developer',
+  'aplikasi': 'Aplikasi & Game Developer',
+  'game': 'Aplikasi & Game Developer',
+  'arsitektur': 'Arsitektur',
+  'desain-interior': 'Desain Interior',
+  'dkv': 'Desain Komunikasi Visual',
+  'desain-produk': 'Desain Produk',
+  'fesyen': 'Fashion',
+  'fashion': 'Fashion',
+  'film': 'Film, Animasi & Video',
+  'fotografi': 'Fotografi',
+  'kriya': 'Kriya',
+  'kuliner': 'Kuliner',
+  'musik': 'Musik',
+  'penerbitan': 'Penerbitan',
+  'periklanan': 'Periklanan',
+  'iklan': 'Periklanan',
+  'seni-pertunjukan': 'Seni Pertunjukan',
+  'seni-rupa': 'Seni Rupa',
+  'tv-radio': 'Televisi & Radio',
+  'lainnya': 'Lainnya',
+};
+
+const sektorName = computed(() => {
+  const id = produk.value?.usaha?.sub_sektor_id;
+  return subSektorNames[id] || id || 'Ekraf';
+});
 
 const ownerName = computed(() => {
   return produk.value?.identitas?.nama_lengkap || 'Pelaku Ekraf';
