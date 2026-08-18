@@ -110,7 +110,6 @@
         <div class="bento-grid">
           <!-- Kuliner Card (Big Terracotta) -->
           <div class="bento-card bento-card--kuliner" @click="goToKatalog('kuliner')">
-            <div class="bento-card__icon">🍴</div>
             <div>
               <h3 class="bento-card__title">Kuliner</h3>
               <p class="bento-card__desc">Cita rasa nusantara dengan sentuhan inovasi & sertifikasi legalitas.</p>
@@ -119,7 +118,6 @@
 
           <!-- Fesyen Card (Yellow) -->
           <div class="bento-card bento-card--fesyen" @click="goToKatalog('fesyen')">
-            <div class="bento-card__icon">👕</div>
             <div>
               <h3 class="bento-card__title">Fesyen</h3>
               <p class="bento-card__desc" style="color:var(--clr-charcoal);">Batik, tenun & rancangan busana modern.</p>
@@ -128,7 +126,6 @@
 
           <!-- Kriya Card (White) -->
           <div class="bento-card bento-card--kriya" @click="goToKatalog('kriya')">
-            <div class="bento-card__icon">🪡</div>
             <div>
               <h3 class="bento-card__title">Kriya</h3>
               <p class="bento-card__desc">Kerajinan tangan berkualitas tinggi.</p>
@@ -137,7 +134,6 @@
 
           <!-- Seni Rupa Card (Blush Pink) -->
           <div class="bento-card bento-card--seni-rupa" @click="goToKatalog('seni-rupa')">
-            <div class="bento-card__icon">🎨</div>
             <div>
               <h3 class="bento-card__title">Seni Rupa</h3>
               <p class="bento-card__desc">Eksplorasi visual tanpa batas dari seniman lokal terkurasi.</p>
@@ -146,7 +142,6 @@
 
           <!-- Film & Animasi Card (White) -->
           <div class="bento-card bento-card--film" @click="goToKatalog('film')">
-            <div class="bento-card__icon">🎬</div>
             <div>
               <h3 class="bento-card__title">Film & Animasi</h3>
               <p class="bento-card__desc">Karya audio visual bereputasi.</p>
