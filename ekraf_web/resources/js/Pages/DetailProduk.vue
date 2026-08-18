@@ -14,17 +14,6 @@
 
     <!-- DETAIL PRODUK CONTENT -->
     <div v-else>
-      <!-- Breadcrumb -->
-      <div class="breadcrumb-bar">
-        <div class="container" style="font-size:0.8rem;color:var(--clr-muted);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-          <a href="/" style="color:var(--clr-terracotta);">Beranda</a>
-          <span>›</span>
-          <a href="/katalog" style="color:var(--clr-terracotta);">Katalog Karya</a>
-          <span>›</span>
-          <span style="color:var(--clr-charcoal);font-weight:600;">{{ produk.usaha?.nama_usaha }}</span>
-        </div>
-      </div>
-
       <div class="container" style="padding:3rem 1.5rem 5rem;">
         <!-- HEADER TITLE -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
