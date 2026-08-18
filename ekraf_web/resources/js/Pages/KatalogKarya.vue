@@ -9,7 +9,6 @@
             <p style="color:var(--clr-muted);font-size:0.95rem;margin:0;">Jelajahi dan apresiasi portofolio karya kreatif terverifikasi HAKI seluruh daerah.</p>
           </div>
           <div class="search-wrap">
-            <span class="search-icon">🔍</span>
             <input
               v-model="searchQuery"
               type="text"
@@ -19,26 +18,6 @@
             />
           </div>
         </div>
-
-        <!-- CATEGORY CHIPS SCROLLBAR (MOBILE & DESKTOP QUICK SELECT) -->
-        <!-- <div class="category-chips-scroll">
-          <button
-            class="chip-item"
-            :class="{ active: filterSektor === '' }"
-            @click="filterSektor = ''"
-          >
-            ✨ Semua (17)
-          </button>
-          <button
-            v-for="s in subSektors"
-            :key="s.id"
-            class="chip-item"
-            :class="{ active: filterSektor === s.id }"
-            @click="filterSektor = s.id"
-          >
-            <span>{{ s.icon }}</span> <span>{{ s.nama.split(' ')[0] }}</span>
-          </button>
-        </div> -->
 
         <!-- COMPACT FILTER BAR CONTAINING SELECTS -->
         <div class="filter-bar">
