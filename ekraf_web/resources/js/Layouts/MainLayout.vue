@@ -93,10 +93,11 @@
         <div>
           <div style="font-family:var(--font-mono);font-weight:700;font-size:0.75rem;text-transform:uppercase;color:var(--clr-charcoal);margin-bottom:0.75rem;">Sub-Sektor Utama</div>
           <ul class="footer__links">
-            <li><a href="/katalog?sektor=kuliner">Kuliner Nusantara</a></li>
-            <li><a href="/katalog?sektor=kriya">Kriya & Craft</a></li>
-            <li><a href="/katalog?sektor=fesyen">Fesyen & Woven</a></li>
-            <li><a href="/katalog?sektor=seni-rupa">Seni Rupa & Visual</a></li>
+            <li><a href="/katalog?sektor=kuliner">Kuliner</a></li>
+            <li><a href="/katalog?sektor=kriya">Kriya</a></li>
+            <li><a href="/katalog?sektor=fesyen">Fashion</a></li>
+            <li><a href="/katalog?sektor=seni-rupa">Seni Rupa</a></li>
+            <li><a href="/katalog?sektor=film">Film, Animasi & Video</a></li>
           </ul>
         </div>
         <div>
