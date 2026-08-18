@@ -940,29 +940,24 @@ a { text-decoration: none; color: inherit; }
 
 /* ── PAGINATION CONTROLS ── */
 .pagination-wrap {
+  background: #ffffff;
+  border: 1px solid var(--clr-border);
+  box-shadow: 4px 4px 0px rgba(28, 25, 23, 0.15);
+  padding: 1.15rem 1.35rem;
+  margin-top: 3rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--clr-border);
   flex-wrap: wrap;
+  border-radius: 2px;
 }
 
 .pagination-info {
   font-family: var(--font-mono);
-  font-size: 0.825rem;
+  font-size: 0.85rem;
   color: var(--clr-charcoal);
   font-weight: 600;
-  background: #ffffff;
-  border: 1px solid var(--clr-charcoal);
-  box-shadow: 2px 2px 0px rgba(28, 25, 23, 0.1);
-  padding: 0.5rem 1.1rem;
-  border-radius: 2px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .pagination-controls {
