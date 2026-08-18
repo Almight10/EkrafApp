@@ -256,8 +256,8 @@ const subSektorIcons = {
   'kuliner': '🍽️', 'kriya': '🪡', 'fesyen': '👗', 'musik': '🎵',
   'seni-pertunjukan': '🎭', 'seni-rupa': '🖼️', 'dkv': '🎨',
   'desain-produk': '⚙️', 'desain-interior': '🏠', 'arsitektur': '🏛️',
-  'fotografi': '📷', 'game': '🎮', 'aplikasi': '📱', 'film': '🎬',
-  'iklan': '📢', 'penerbitan': '📚', 'tv-radio': '📺'
+  'fotografi': '📷', 'aplikasi-game': '🎮', 'game': '🎮', 'aplikasi': '📱', 'film': '🎬',
+  'periklanan': '📢', 'iklan': '📢', 'penerbitan': '📚', 'tv-radio': '📺', 'lainnya': '✨'
 };
 
 const sektorIcon = computed(() => {

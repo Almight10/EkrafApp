@@ -151,32 +151,43 @@ export function normalizeEkrafData(row) {
     };
 }
 
-// Helper: Normalize sub-sektor string to URL-friendly ID
+// Helper: Normalize sub-sektor string to URL-friendly ID matching Android list
 function normalizeSubSektor(sektor) {
+    if (!sektor) return 'kriya';
+    const s = String(sektor).toLowerCase().trim();
     const map = {
-        'kuliner': 'kuliner',
-        'kriya': 'kriya',
-        'fashion': 'fesyen',
-        'fesyen': 'fesyen',
-        'musik': 'musik',
-        'seni pertunjukan': 'seni-pertunjukan',
-        'seni rupa': 'seni-rupa',
+        'aplikasi & game developer': 'aplikasi-game',
+        'aplikasi game developer': 'aplikasi-game',
+        'aplikasi': 'aplikasi-game',
+        'game': 'aplikasi-game',
+        'arsitektur': 'arsitektur',
+        'desain interior': 'desain-interior',
         'desain komunikasi visual': 'dkv',
+        'desain komunikasi visual (dkv)': 'dkv',
         'dkv': 'dkv',
         'desain produk': 'desain-produk',
-        'desain interior': 'desain-interior',
-        'arsitektur': 'arsitektur',
-        'fotografi': 'fotografi',
-        'aplikasi & game developer': 'aplikasi',
-        'aplikasi': 'aplikasi',
-        'game': 'game',
+        'fashion': 'fesyen',
+        'fesyen': 'fesyen',
         'film, animasi & video': 'film',
+        'film animasi & video': 'film',
         'film': 'film',
-        'periklanan': 'iklan',
+        'animasi': 'film',
+        'video': 'film',
+        'fotografi': 'fotografi',
+        'kriya': 'kriya',
+        'kuliner': 'kuliner',
+        'musik': 'musik',
         'penerbitan': 'penerbitan',
+        'periklanan': 'periklanan',
+        'iklan': 'periklanan',
+        'seni pertunjukan': 'seni-pertunjukan',
+        'seni rupa': 'seni-rupa',
         'televisi & radio': 'tv-radio',
+        'tv & radio': 'tv-radio',
+        'tv-radio': 'tv-radio',
+        'lainnya': 'lainnya',
     };
-    return map[sektor?.toLowerCase()?.trim()] || sektor?.toLowerCase()?.replace(/\s+/g, '-') || 'kriya';
+    return map[s] || s.replace(/\s+/g, '-') || 'kriya';
 }
 
 // Helper: Parse harga string "Rp 250.000" or number → integer
