@@ -17,22 +17,6 @@ export default defineConfig({
             },
         }),
     ],
-    build: {
-        rollupOptions: {
-            output: {
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        if (id.includes('@supabase')) {
-                            return 'vendor-supabase';
-                        }
-                        if (id.includes('vue') || id.includes('@inertiajs')) {
-                            return 'vendor-vue';
-                        }
-                    }
-                }
-            }
-        }
-    },
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

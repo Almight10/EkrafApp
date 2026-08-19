@@ -258,9 +258,9 @@ function setSlide(idx) {
 }
 
 const fallbackArtworks = [
-  'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=380&q=65&auto=format',
-  'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=380&q=65&auto=format',
-  'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=380&q=65&auto=format'
+  'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80'
 ];
 
 function onHeroImgError(event, idx) {

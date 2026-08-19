@@ -85,7 +85,7 @@
     <footer class="footer">
       <div class="container footer__inner">
         <div>
-          <div class="footer__brand">Kreasi Ekraf</div>
+          <div class="footer__brand">Kreasi qEkraf</div>
           <p style="font-size:0.875rem;line-height:1.7;color:var(--clr-muted);max-width:400px;">
             Platform digital premium untuk mengeksplorasi, mengoleksi, dan merayakan karya terbaik dari 17 sub-sektor ekonomi kreatif Indonesia berbasis HAKI.
           </p>
