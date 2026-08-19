@@ -38,6 +38,8 @@
                 :src="activeImage"
                 :alt="produk.usaha?.nama_usaha"
                 class="product-gallery__main"
+                fetchpriority="high"
+                decoding="async"
                 @error="onDetailImgError"
               />
               <div v-else style="height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;background:var(--clr-bg-alt);border-radius:2px;color:var(--clr-terracotta);">
@@ -54,6 +56,8 @@
                 :alt="`Foto ${idx+1}`"
                 class="product-gallery__thumb"
                 :class="{ active: activeImage === img }"
+                loading="lazy"
+                decoding="async"
                 @click="activeImage = img"
               />
             </div>

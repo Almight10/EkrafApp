@@ -31,6 +31,10 @@
                   <img
                     :src="card.image"
                     :alt="card.title"
+                    fetchpriority="high"
+                    decoding="async"
+                    width="230"
+                    height="220"
                     @error="onHeroImgError($event, idx)"
                   />
                   <div class="hero__photo-caption">
@@ -66,6 +70,10 @@
                 <img
                   :src="card.image"
                   :alt="card.title"
+                  fetchpriority="high"
+                  decoding="async"
+                  width="230"
+                  height="220"
                   @error="onHeroImgError($event, idx)"
                 />
                 <div class="hero__photo-caption">

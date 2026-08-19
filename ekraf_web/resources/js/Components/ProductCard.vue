@@ -7,6 +7,9 @@
         :alt="produk.usaha?.nama_usaha"
         class="card__img"
         loading="lazy"
+        decoding="async"
+        width="400"
+        height="300"
         @error="imgError = true"
       />
       <div

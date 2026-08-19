@@ -4,8 +4,6 @@
    Fonts: Playfair Display (Serif), Plus Jakarta Sans (Sans), JetBrains Mono
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
-
 :root {
   /* Editorial Palette */
   --clr-bg:          #faf6f0;
@@ -50,8 +48,14 @@
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
 
 /* ── BODY & WATERMARK BACKGROUND ── */
 body {
@@ -67,9 +71,10 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
+  overflow-x: hidden;
 }
 
-img { display: block; max-width: 100%; }
+img { display: block; max-width: 100%; height: auto; }
 a { text-decoration: none; color: inherit; }
 
 /* CONTAINER & TYPOGRAPHY SCALE */
@@ -1391,7 +1396,13 @@ a { text-decoration: none; color: inherit; }
   flex-wrap: wrap;
 }
 
-/* RESPONSIVE */
+/* RESPONSIVE DESIGN SYSTEM (ALL DEVICES) */
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll; /* Performance fix: disable fixed background on mobile to prevent GPU scroll repaint lag */
+  }
+}
+
 @media (max-width: 900px) {
   .navbar__links--desktop,
   .navbar__actions--desktop {
@@ -1437,7 +1448,7 @@ a { text-decoration: none; color: inherit; }
     width: 190px;
     padding: 8px 8px 18px 8px;
     top: 50%;
-    animation: none; /* disable float animation on mobile — it overrides top: 50% */
+    animation: none; /* disable float animation on mobile — avoids top offset CPU spikes */
   }
   .hero__photo-card img {
     height: 160px;
@@ -1644,15 +1655,6 @@ a { text-decoration: none; color: inherit; }
   }
   .hero__photo-card img {
     height: 155px;
-  }
-  .hero__photo-card--1 {
-    transform: rotate(4deg) translate(12px, -8px);
-  }
-  .hero__photo-card--2 {
-    transform: rotate(-5deg) translate(-18px, -16px);
-  }
-  .hero__photo-card--3 {
-    transform: rotate(2deg) translate(-1px, 12px);
   }
   .product-detail__title {
     font-size: 1.5rem;
