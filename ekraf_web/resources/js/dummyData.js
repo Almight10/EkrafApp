@@ -16,10 +16,10 @@ export const dummyProducts = [
       harga: 850000,
       deskripsi_produk: 'Sebuah mahakarya kain tenun tradisional yang memadukan kehangatan warna alam dengan keahlian tangan pengrajin lokal. Ditenun helai demi helai menggunakan bahan alami ramah lingkungan.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {
@@ -47,9 +47,9 @@ export const dummyProducts = [
       harga: 3200000,
       deskripsi_produk: 'Mahakarya furnitur dari akar kayu jati tua dengan sentuhan ukiran halus dan penyelesaian minyak alami non-kimia yang menonjolkan urat kayu eksotis.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {
@@ -77,9 +77,9 @@ export const dummyProducts = [
       harga: 1250000,
       deskripsi_produk: 'Eksplorasi visual karya seni digital terkurasi bertema kosmologi lokal dengan kombinasi warna neon futuristik dan elemen batik klasik Probolinggo.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {
@@ -107,8 +107,8 @@ export const dummyProducts = [
       harga: 450000,
       deskripsi_produk: 'Kain batik tulis halus khas Probolinggo bermotif Mangga Manalagi dan daun anggur dengan pewarnaan alami ramah lingkungan. Karya ini sedang dalam proses pendaftaran Hak Cipta.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {
@@ -136,9 +136,9 @@ export const dummyProducts = [
       harga: 135000,
       deskripsi_produk: 'Biji kopi pilihan roasted kualitas medium-dark dari lereng Gunung Bromo dengan profil rasa cokelat rempah & acidity seimbang khas kopi dataran tinggi.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=380&q=65&auto=format',
+        'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {
@@ -166,7 +166,7 @@ export const dummyProducts = [
       harga: 950000,
       deskripsi_produk: 'Cetakan karya seni grafis arsitektural berseri terbatas dengan kertas fine art 300gsm dan tinta pigmen tahan pudar hingga 50 tahun.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {
@@ -194,7 +194,7 @@ export const dummyProducts = [
       harga: 280000,
       deskripsi_produk: 'Lampu meja berbahan bambu petung pilihan yang diolah tahan hama dengan pencahayaan hangat romantis untuk suasana ruang tamu atau kamar tidur. Sedang dalam tahap pengajuan HAKI.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {
@@ -222,7 +222,7 @@ export const dummyProducts = [
       harga: 2400000,
       deskripsi_produk: 'Outer fesyen kontemporer memadukan kain tenun tangan dengan potongan asimetris modern yang elegan untuk acara formal maupun casual.',
       foto_produk_urls: [
-        'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80'
+        'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=380&q=65&auto=format'
       ]
     },
     legalitas: {

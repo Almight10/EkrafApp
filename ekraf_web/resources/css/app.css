@@ -64,7 +64,7 @@ body {
   background-color: var(--clr-bg);
   background-image: url('/images/batik-probolinggo-pattern1.svg');
   background-repeat: repeat;
-  background-size: 960px auto;
+  background-size: 200px 200px;
   background-attachment: fixed;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;

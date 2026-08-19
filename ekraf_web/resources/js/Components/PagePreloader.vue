@@ -88,20 +88,23 @@ import { router } from '@inertiajs/vue3';
 const props = defineProps({
   initialLoadingDuration: {
     type: Number,
-    default: 1000
+    default: 0
   }
 });
 
-const isLoading = ref(true);
+const isLoading = ref(props.initialLoadingDuration > 0);
 let removeStartListener = null;
 let removeFinishListener = null;
 let timeoutTimer = null;
 
 onMounted(() => {
-  // Hide initial page mount loading
-  timeoutTimer = setTimeout(() => {
+  if (props.initialLoadingDuration > 0) {
+    timeoutTimer = setTimeout(() => {
+      isLoading.value = false;
+    }, props.initialLoadingDuration);
+  } else {
     isLoading.value = false;
-  }, props.initialLoadingDuration);
+  }
 
   // Allow manually triggering animation for demo/testing
   if (typeof window !== 'undefined') {
