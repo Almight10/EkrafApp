@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <defs>
+    <!-- Gradients matching Ekraf Probolinggo Branding -->
+    <linearGradient id="ekrafOrangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F25822" />
+      <stop offset="100%" stop-color="#E03E0B" />
+    </linearGradient>
+    <linearGradient id="ekrafPurpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7B0099" />
+      <stop offset="100%" stop-color="#550070" />
+    </linearGradient>
+    <linearGradient id="ekrafMagentaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BC22E0" />
+      <stop offset="100%" stop-color="#8A00AA" />
+    </linearGradient>
+    <linearGradient id="ekrafLightMagentaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D946EF" />
+      <stop offset="100%" stop-color="#A855F7" />
+    </linearGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="ekrafGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComponentTransfer in="blur" result="glow">
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g transform="translate(10, 0)">
+    <!-- OUTER ORANGE CRESCENT ARC -->
+    <path class="ekraf-orange-arc"
+          d="M 205,75
+             C 145,55 75,95 72,160
+             C 69,225 125,255 170,242
+             C 125,248 90,215 95,160
+             C 100,105 155,75 205,75 Z"
+          fill="url(#ekrafOrangeGrad)" />
+
+    <!-- INNER PURPLE RIBBON -->
+    <path class="ekraf-purple-arc"
+          d="M 165,108
+             C 125,120 102,152 107,188
+             C 112,224 140,240 170,238
+             C 132,236 122,198 126,165
+             C 130,135 148,118 165,108 Z"
+          fill="url(#ekrafPurpleGrad)" />
+
+    <!-- ANGGUR PROBOLINGGO GRAPE BUBBLE CLUSTER -->
+    <g class="ekraf-grapes-cluster">
+      <circle class="grape-bubble g1" cx="150" cy="225" r="18" fill="url(#ekrafPurpleGrad)" />
+      <circle class="grape-bubble g2" cx="172" cy="232" r="19" fill="url(#ekrafMagentaGrad)" />
+      <circle class="grape-bubble g3" cx="162" cy="202" r="23" fill="url(#ekrafPurpleGrad)" />
+      <circle class="grape-bubble g4" cx="192" cy="216" r="18" fill="url(#ekrafMagentaGrad)" />
+      <circle class="grape-bubble g5" cx="215" cy="206" r="16" fill="url(#ekrafLightMagentaGrad)" />
+      <circle class="grape-bubble g6" cx="200" cy="186" r="17" fill="url(#ekrafMagentaGrad)" />
+      <circle class="grape-bubble g7" cx="224" cy="184" r="14" fill="url(#ekrafLightMagentaGrad)" />
+    </g>
+  </g>
+</svg>
