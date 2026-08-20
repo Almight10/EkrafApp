@@ -63,16 +63,30 @@ export function isApprovedEkrafData(row) {
  */
 
 export function normalizeEkrafData(row) {
-    // Determine author name with fallback to joined public.users table
+    if (!row) return {};
+
+    // Support row.users being an Object OR an Array (PostgREST join variations)
+    const userObj = Array.isArray(row.users) ? row.users[0] : row.users;
+    const rawData = row._raw || row;
+    const userRawObj = Array.isArray(rawData?.users) ? rawData.users[0] : rawData?.users;
+
+    const usersData = userObj || userRawObj || {};
+
+    // Determine author name with fallback to joined public.users table or row fields
     const ownerName =
         (row.nama_lengkap && String(row.nama_lengkap).trim()) ||
-        (row.users?.nama_lengkap && String(row.users.nama_lengkap).trim()) ||
+        (usersData.nama_lengkap && String(usersData.nama_lengkap).trim()) ||
+        (usersData.nama && String(usersData.nama).trim()) ||
+        (usersData.full_name && String(usersData.full_name).trim()) ||
+        (usersData.name && String(usersData.name).trim()) ||
         (row.identitas?.nama_lengkap && String(row.identitas.nama_lengkap).trim()) ||
         row.namaLengkap ||
         '';
 
     const ownerPhone =
-        row.users?.no_hp ||
+        usersData.no_hp ||
+        usersData.no_wa ||
+        usersData.phone ||
         row.no_hp ||
         row.noHp ||
         row.no_wa ||
@@ -80,13 +94,22 @@ export function normalizeEkrafData(row) {
         '';
 
     const ownerPhoto =
-        (row.users?.foto_url && String(row.users.foto_url).trim()) ||
+        (usersData.foto_url && String(usersData.foto_url).trim()) ||
         (row.identitas?.foto_url && String(row.identitas.foto_url).trim()) ||
         '';
 
-    const alamatStr = (row.alamat && String(row.alamat).trim()) || (row.users?.alamat && String(row.users.alamat).trim()) || '';
-    const kecamatanStr = (row.kecamatan && String(row.kecamatan).trim()) || (row.users?.kecamatan && String(row.users.kecamatan).trim()) || '';
-    const kelurahanStr = (row.kelurahan && String(row.kelurahan).trim()) || (row.users?.kelurahan && String(row.users.kelurahan).trim()) || '';
+    const alamatStr =
+        (row.alamat && String(row.alamat).trim()) ||
+        (usersData.alamat && String(usersData.alamat).trim()) ||
+        '';
+    const kecamatanStr =
+        (row.kecamatan && String(row.kecamatan).trim()) ||
+        (usersData.kecamatan && String(usersData.kecamatan).trim()) ||
+        '';
+    const kelurahanStr =
+        (row.kelurahan && String(row.kelurahan).trim()) ||
+        (usersData.kelurahan && String(usersData.kelurahan).trim()) ||
+        '';
 
     const lokasiLengkap = [alamatStr, kelurahanStr ? `Kel. ${kelurahanStr}` : '', kecamatanStr ? `Kec. ${kecamatanStr}` : '']
         .filter(Boolean)
@@ -94,21 +117,22 @@ export function normalizeEkrafData(row) {
 
     // Already in nested web format
     if (row.usaha && typeof row.usaha === 'object') {
+        const currentAlamat = row.usaha.alamat && row.usaha.alamat !== 'Kota Probolinggo' ? row.usaha.alamat : lokasiLengkap;
         return {
             ...row,
             user_id: row.user_id || row.userId || '',
             usaha: {
                 ...row.usaha,
-                alamat: row.usaha.alamat || lokasiLengkap,
+                alamat: currentAlamat,
             },
             identitas: {
                 ...row.identitas,
-                nama_lengkap: ownerName,
-                no_wa: ownerPhone,
-                foto_url: ownerPhoto,
-                alamat: alamatStr,
-                kecamatan: kecamatanStr,
-                kelurahan: kelurahanStr,
+                nama_lengkap: ownerName || row.identitas?.nama_lengkap || '',
+                no_wa: ownerPhone || row.identitas?.no_wa || '',
+                foto_url: ownerPhoto || row.identitas?.foto_url || '',
+                alamat: alamatStr || row.identitas?.alamat || '',
+                kecamatan: kecamatanStr || row.identitas?.kecamatan || '',
+                kelurahan: kelurahanStr || row.identitas?.kelurahan || '',
             }
         };
     }
@@ -245,23 +269,71 @@ export async function resolveProfilePhotoUrl(userId) {
 }
 
 export async function enrichOwnerProfilePhoto(item) {
-    if (!item?.identitas?.foto_url) {
-        const userId = item.user_id || item._raw?.user_id;
-        if (userId) {
-            const fotoUrl = await resolveProfilePhotoUrl(userId);
-            if (fotoUrl) {
-                return {
-                    ...item,
-                    identitas: {
-                        ...item.identitas,
-                        foto_url: fotoUrl,
+    if (!item) return item;
+
+    let updatedItem = { ...item };
+    const userId = item.user_id || item._raw?.user_id;
+
+    // Check if owner name or address is missing/default
+    const nameMissing = !updatedItem.identitas?.nama_lengkap || updatedItem.identitas.nama_lengkap === 'Pelaku Ekraf';
+    const addressMissing = !updatedItem.identitas?.alamat || updatedItem.usaha?.alamat === 'Kota Probolinggo';
+
+    if (userId && isSupabaseConfigured && (nameMissing || addressMissing)) {
+        try {
+            const { data: uData } = await supabase
+                .from('users')
+                .select('nama_lengkap, no_hp, alamat, kecamatan, kelurahan, foto_url')
+                .eq('id', userId)
+                .maybeSingle();
+
+            if (uData) {
+                const name = uData.nama_lengkap || uData.nama || uData.full_name || '';
+                const phone = uData.no_hp || uData.no_wa || '';
+                const photo = uData.foto_url || '';
+                const alamatStr = uData.alamat || '';
+                const kecStr = uData.kecamatan || '';
+                const kelStr = uData.kelurahan || '';
+
+                const lokasiLengkap = [alamatStr, kelStr ? `Kel. ${kelStr}` : '', kecStr ? `Kec. ${kecStr}` : '']
+                    .filter(Boolean)
+                    .join(', ');
+
+                updatedItem = {
+                    ...updatedItem,
+                    usaha: {
+                        ...updatedItem.usaha,
+                        alamat: (lokasiLengkap || updatedItem.usaha?.alamat) || 'Kota Probolinggo',
                     },
+                    identitas: {
+                        ...updatedItem.identitas,
+                        nama_lengkap: name || updatedItem.identitas?.nama_lengkap || 'Pelaku Ekraf',
+                        no_wa: phone || updatedItem.identitas?.no_wa || '',
+                        foto_url: photo || updatedItem.identitas?.foto_url || '',
+                        alamat: alamatStr || updatedItem.identitas?.alamat || '',
+                        kecamatan: kecStr || updatedItem.identitas?.kecamatan || '',
+                        kelurahan: kelStr || updatedItem.identitas?.kelurahan || '',
+                    }
                 };
             }
+        } catch (e) {
+            console.warn('[Ekraf] Notice fetching user profile fallback:', e);
         }
     }
 
-    return item;
+    if (!updatedItem.identitas?.foto_url && userId) {
+        const fotoUrl = await resolveProfilePhotoUrl(userId);
+        if (fotoUrl) {
+            updatedItem = {
+                ...updatedItem,
+                identitas: {
+                    ...updatedItem.identitas,
+                    foto_url: fotoUrl,
+                },
+            };
+        }
+    }
+
+    return updatedItem;
 }
 
 export default supabase;

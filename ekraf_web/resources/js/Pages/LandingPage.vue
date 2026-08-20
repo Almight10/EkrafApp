@@ -310,7 +310,7 @@ async function loadData() {
     // Fetch latest products with user location via join with public.users
     const { data, error } = await supabase
       .from('ekraf_data')
-      .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap)')
+      .select('*, users:user_id(nama_lengkap, no_hp, alamat, kecamatan, kelurahan, foto_url)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

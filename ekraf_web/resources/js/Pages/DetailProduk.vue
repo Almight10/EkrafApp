@@ -121,7 +121,7 @@
                 </div>
                 <div>
                   <div class="product-detail__owner-label">Lokasi Usaha</div>
-                  <div class="product-detail__owner-address">{{ produk.usaha?.alamat || 'Kota Probolinggo' }}</div>
+                  <div class="product-detail__owner-address">{{ ownerAddress }}</div>
                 </div>
               </div>
             </div>
@@ -275,6 +275,17 @@ const ownerName = computed(() => {
   return produk.value?.identitas?.nama_lengkap || 'Pelaku Ekraf';
 });
 
+const ownerAddress = computed(() => {
+  const uAlamat = produk.value?.usaha?.alamat;
+  const iAlamat = produk.value?.identitas?.alamat;
+  const kec = produk.value?.identitas?.kecamatan;
+  const kel = produk.value?.identitas?.kelurahan;
+  
+  if (uAlamat && uAlamat !== 'Kota Probolinggo') return uAlamat;
+  const fullLoc = [iAlamat, kel ? `Kel. ${kel}` : '', kec ? `Kec. ${kec}` : ''].filter(Boolean).join(', ');
+  return fullLoc || uAlamat || 'Kota Probolinggo';
+});
+
 const ownerPhoto = computed(() => {
   return produk.value?.identitas?.foto_url || '';
 });
@@ -340,7 +351,7 @@ async function loadDetail() {
     // 1. Fetch rows from Supabase ekraf_data table to match pure slug or ID
     const { data: list, error } = await supabase
       .from('ekraf_data')
-      .select('*, users!user_id(alamat, kecamatan, kelurahan, no_hp, nama_lengkap, foto_url)');
+      .select('*, users:user_id(nama_lengkap, no_hp, alamat, kecamatan, kelurahan, foto_url)');
 
     if (error) console.warn('[Ekraf] Supabase query notice:', error?.message || error);
 

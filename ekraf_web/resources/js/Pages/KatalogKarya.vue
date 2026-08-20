@@ -277,7 +277,7 @@ async function loadProduk() {
   try {
     const { data, error } = await supabase
       .from('ekraf_data')
-      .select('*, users!user_id(nama_lengkap, no_hp, alamat, kecamatan, kelurahan)')
+      .select('*, users:user_id(nama_lengkap, no_hp, alamat, kecamatan, kelurahan, foto_url)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
