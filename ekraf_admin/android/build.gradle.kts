@@ -19,19 +19,29 @@ subprojects {
         val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
         project.layout.buildDirectory.value(newSubprojectBuildDir)
     }
-    project.evaluationDependsOn(":app")
 
-    // Configure NDK version for Android projects without using afterEvaluate
-    plugins.withId("com.android.application") {
-        val android = extensions.findByName("android")
-        if (android is com.android.build.gradle.BaseExtension) {
-            android.ndkVersion = "28.2.13676358"
-        }
+    // Only call evaluationDependsOn for non-app subprojects — calling it
+    // on :app itself causes "project already evaluated" when afterEvaluate runs.
+    if (project.name != "app") {
+        project.evaluationDependsOn(":app")
     }
-    plugins.withId("com.android.library") {
-        val android = extensions.findByName("android")
-        if (android is com.android.build.gradle.BaseExtension) {
-            android.ndkVersion = "28.2.13676358"
+
+    // Force compileSdkVersion=36 and NDK on ALL Android subprojects (app + plugins).
+    // If the project is already evaluated (e.g. :app, due to dependency ordering),
+    // we configure it immediately to avoid "Project already evaluated" errors.
+    if (state.executed) {
+        val androidExt = extensions.findByName("android")
+        if (androidExt is com.android.build.gradle.BaseExtension) {
+            androidExt.compileSdkVersion(36)
+            androidExt.ndkVersion = "28.2.13676358"
+        }
+    } else {
+        afterEvaluate {
+            val androidExt = extensions.findByName("android")
+            if (androidExt is com.android.build.gradle.BaseExtension) {
+                androidExt.compileSdkVersion(36)
+                androidExt.ndkVersion = "28.2.13676358"
+            }
         }
     }
 }

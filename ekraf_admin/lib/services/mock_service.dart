@@ -85,6 +85,7 @@ class MockDataService {
 
   Future<void> updateData(EkrafData data) async {
     try {
+      // Update data usaha di tabel ekraf_data
       final Map<String, dynamic> updateMap = {
         'nama_usaha': data.namaUsaha,
         'sub_sektor': data.subSektor,
@@ -103,6 +104,18 @@ class MockDataService {
         'catatan_admin': data.catatanAdmin,
       };
       await _client.from('ekraf_data').update(updateMap).eq('id', data.id);
+
+      // Update data identitas pelaku di tabel users (sumber data tunggal)
+      final Map<String, dynamic> userUpdateMap = {
+        'nama_lengkap': data.namaLengkap,
+        'nik': data.nik,
+        'no_hp': data.noHp,
+        'email': data.email,
+        'alamat': data.alamat,
+        'kecamatan': data.kecamatan,
+        'kelurahan': data.kelurahan,
+      };
+      await _client.from('users').update(userUpdateMap).eq('id', data.userId);
     } catch (e) {
       debugPrint('Eror updateData Supabase: $e');
       rethrow;

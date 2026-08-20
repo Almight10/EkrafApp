@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 import '../models/ekraf_data.dart';
+import '../providers/ekraf_provider.dart';
 
 class LengkapiProfileScreen extends StatefulWidget {
   const LengkapiProfileScreen({super.key});
@@ -153,6 +154,10 @@ class _LengkapiProfileScreenState extends State<LengkapiProfileScreen> {
       );
 
       if (mounted) {
+        // Panggil reload pada EkrafProvider agar perubahan identitas
+        // langsung terefleksi di daftar pengajuan ekraf (karena join dengan users).
+        context.read<EkrafProvider>().loadData();
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

@@ -26,7 +26,21 @@ class _InputFormScreenState extends State<InputFormScreen> {
   final List<dynamic> _allProductImages = [];
   final ImagePicker _picker = ImagePicker();
 
+  static const int _maxProductImages = 5;
+
   Future<void> _pickProductImage() async {
+    final remaining = _maxProductImages - _allProductImages.length;
+
+    if (remaining <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Maksimal $_maxProductImages foto produk.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -40,7 +54,8 @@ class _InputFormScreenState extends State<InputFormScreen> {
               title: const Text('Ambil dari Kamera'),
               onTap: () async {
                 Navigator.of(context).pop();
-                final picked = await _picker.pickImage(source: ImageSource.camera, imageQuality: 70);
+                final picked = await _picker.pickImage(
+                    source: ImageSource.camera, imageQuality: 70);
                 if (picked != null) {
                   setState(() {
                     _allProductImages.add(File(picked.path));
@@ -50,13 +65,37 @@ class _InputFormScreenState extends State<InputFormScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Pilih dari Galeri'),
+              title: const Text('Pilih 1 Foto dari Galeri'),
               onTap: () async {
                 Navigator.of(context).pop();
-                final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+                final picked = await _picker.pickImage(
+                    source: ImageSource.gallery, imageQuality: 70);
                 if (picked != null) {
                   setState(() {
                     _allProductImages.add(File(picked.path));
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded),
+              title: Text(
+                  'Pilih Banyak Foto dari Galeri (sisa $remaining foto)'),
+              subtitle: Text(
+                  'Maks $_maxProductImages foto. Sudah dipilih: ${_allProductImages.length}'),
+              onTap: () async {
+                Navigator.of(context).pop();
+                final pickedList = await _picker.pickMultiImage(
+                  imageQuality: 70,
+                  limit: remaining,
+                );
+                if (pickedList.isNotEmpty) {
+                  setState(() {
+                    for (final img in pickedList) {
+                      if (_allProductImages.length < _maxProductImages) {
+                        _allProductImages.add(File(img.path));
+                      }
+                    }
                   });
                 }
               },
@@ -66,6 +105,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
       ),
     );
   }
+
 
   // Step 1 - Identitas
   final _namaController = TextEditingController();

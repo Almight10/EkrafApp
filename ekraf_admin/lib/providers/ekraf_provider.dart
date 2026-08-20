@@ -13,8 +13,10 @@ class EkrafProvider extends ChangeNotifier {
   String? _filterSubSektor;
 
   List<EkrafData> get data => _filteredData;
+  List<EkrafData> get allData => _allData;
   bool get isLoading => _isLoading;
   String get searchQuery => _searchQuery;
+
   VerificationStatus? get filterStatus => _filterStatus;
   String? get filterSubSektor => _filterSubSektor;
 
@@ -81,6 +83,14 @@ class EkrafProvider extends ChangeNotifier {
   }
 
   Future<void> updateEntry(EkrafData data) async {
+    // Optimistic update
+    final index = _allData.indexWhere((e) => e.id == data.id);
+    if (index != -1) {
+      _allData[index] = data;
+      _applyFilters();
+      notifyListeners();
+    }
+    
     await _service.updateData(data);
     await loadData();
   }
