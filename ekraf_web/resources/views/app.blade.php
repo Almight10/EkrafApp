@@ -8,9 +8,10 @@
         <meta name="description" content="Katalog Karya Ekonomi Kreatif Daerah Berbasis HAKI">
 
 
-        <!-- Image CDN Preconnects for Fast LCP -->
+        <!-- Image CDN Preconnects & LCP Image Preload -->
         <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
         <link rel="preconnect" href="https://fuiruqmhcbyajuovkxci.supabase.co" crossorigin>
+        <link rel="preload" as="image" href="https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=360&q=70&fm=webp" fetchpriority="high">
 
         <!-- Google Fonts (Optimized Non-Blocking Load) -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
