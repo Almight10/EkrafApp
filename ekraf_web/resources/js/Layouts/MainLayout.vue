@@ -14,7 +14,7 @@
         <!-- Desktop Navigation Links -->
         <ul class="navbar__links navbar__links--desktop">
           <li><a href="/" :class="{ active: currentPath === '/' || currentPath === '' }">Beranda</a></li>
-          <li><a href="/katalog" :class="{ active: currentPath.startsWith('/katalog') }">Katalog Karya</a></li>
+          <li><a href="/katalog" :class="{ active: currentPath.startsWith('/katalog') || currentPath.startsWith('/detail') }">Katalog Karya</a></li>
         </ul>
 
         <!-- Desktop Actions -->
@@ -50,7 +50,7 @@
             </a>
             <a
               href="/katalog"
-              :class="{ active: currentPath.startsWith('/katalog') }"
+              :class="{ active: currentPath.startsWith('/katalog') || currentPath.startsWith('/detail') }"
               @click="closeMobileMenu"
               class="mobile-drawer__link"
             >
