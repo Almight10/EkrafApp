@@ -92,27 +92,21 @@ const props = defineProps({
   }
 });
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 let removeStartListener = null;
 let removeFinishListener = null;
-let timeoutTimer = null;
 
 onMounted(() => {
-  // Hide initial page mount loading
-  timeoutTimer = setTimeout(() => {
-    isLoading.value = false;
-  }, props.initialLoadingDuration);
-
   // Allow manually triggering animation for demo/testing
   if (typeof window !== 'undefined') {
-    window.triggerEkrafLoader = (ms = 2200) => {
+    window.triggerEkrafLoader = (ms = 1500) => {
       isLoading.value = true;
       setTimeout(() => {
         isLoading.value = false;
       }, ms);
     };
     window.addEventListener('ekraf-show-loader', () => {
-      window.triggerEkrafLoader(2200);
+      window.triggerEkrafLoader(1500);
     });
   }
 
@@ -124,7 +118,7 @@ onMounted(() => {
   removeFinishListener = router.on('finish', () => {
     setTimeout(() => {
       isLoading.value = false;
-    }, 450);
+    }, 100);
   });
 });
 
