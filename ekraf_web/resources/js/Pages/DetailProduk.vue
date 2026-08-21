@@ -378,18 +378,30 @@ async function loadDetail() {
   const param = decodeURIComponent(rawParam).trim();
   const targetSlug = slugify(param);
 
-  if (!isSupabaseConfigured) {
-    produk.value = await enrichOwnerProfilePhoto(getDemoItemById(param));
+  // 1. Instant local/demo match for instant visual paint (Frame 1 LCP)
+  const initialMatch = dummyProducts.find(p => {
+    const s = slugify(p.usaha?.nama_usaha || p.title || p.id);
+    return s === targetSlug || p.id === param;
+  }) || dummyProducts[0];
+
+  if (initialMatch) {
+    produk.value = initialMatch;
     hasOwnerPhotoError.value = false;
-    if (produk.value && images.value.length > 0) {
-      activeImage.value = images.value[0];
+    if (initialMatch.produk?.foto_produk_urls?.length > 0) {
+      activeImage.value = initialMatch.produk.foto_produk_urls[0];
     }
-    loading.value = false;
+    loading.value = false; // Instant paint
+  }
+
+  if (!isSupabaseConfigured) {
+    enrichOwnerProfilePhoto(produk.value).then(enriched => {
+      if (enriched) produk.value = enriched;
+    });
     return;
   }
 
+  // 2. Background Revalidation from Supabase
   try {
-    // 1. Fetch rows from Supabase ekraf_data table to match pure slug or ID
     const { data: list, error } = await supabase
       .from('ekraf_data')
       .select('*, users:user_id(nama_lengkap, no_hp, alamat, kecamatan, kelurahan, foto_url)');
@@ -398,10 +410,8 @@ async function loadDetail() {
 
     let matchedRow = null;
     if (list && list.length > 0) {
-      // Step A: Exact ID match
       matchedRow = list.find(row => String(row.id) === param);
 
-      // Step B: Exact slug match on any name field
       if (!matchedRow) {
         matchedRow = list.find(row => {
           const norm = normalizeEkrafData(row);
@@ -419,7 +429,6 @@ async function loadDetail() {
         });
       }
 
-      // Step C: Flexible substring match
       if (!matchedRow) {
         matchedRow = list.find(row => {
           const norm = normalizeEkrafData(row);
@@ -431,32 +440,18 @@ async function loadDetail() {
     }
 
     if (matchedRow) {
-      produk.value = await enrichOwnerProfilePhoto(normalizeEkrafData(matchedRow));
+      const normalized = normalizeEkrafData(matchedRow);
+      produk.value = normalized;
       hasOwnerPhotoError.value = false;
-      if (images.value.length > 0) activeImage.value = images.value[0];
-    } else {
-      // Search demo items strictly
-      const demoMatch = dummyProducts.find(p => {
-        const s = slugify(p.usaha?.nama_usaha || p.title || p.id);
-        return s === targetSlug || p.id === param;
-      });
-
-      if (demoMatch) {
-        produk.value = await enrichOwnerProfilePhoto(demoMatch);
-        hasOwnerPhotoError.value = false;
-        if (images.value.length > 0) activeImage.value = images.value[0];
-      } else if (list && list.length > 0) {
-        produk.value = await enrichOwnerProfilePhoto(normalizeEkrafData(list[0]));
-        hasOwnerPhotoError.value = false;
-        if (images.value.length > 0) activeImage.value = images.value[0];
-      } else {
-        produk.value = await enrichOwnerProfilePhoto(dummyProducts[0]);
-        hasOwnerPhotoError.value = false;
+      if (normalized.produk?.foto_produk_urls?.length > 0) {
+        activeImage.value = normalized.produk.foto_produk_urls[0];
       }
+      enrichOwnerProfilePhoto(normalized).then(enriched => {
+        if (enriched) produk.value = enriched;
+      });
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat detail:', err?.message || err);
-    produk.value = dummyProducts[0];
   } finally {
     loading.value = false;
   }
