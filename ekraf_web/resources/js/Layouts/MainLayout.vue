@@ -19,8 +19,6 @@
 
         <!-- Desktop Actions -->
         <div class="navbar__actions--desktop">
-          <!-- <button @click="testLoading" class="btn btn-outline btn-sm" title="Uji Coba Animasi Loading">Preview Loading</button> -->
-          <a href="/katalog" class="btn btn-primary btn-sm">Cari Karya</a>
         </div>
 
         <!-- Mobile Hamburger Toggle Button -->
@@ -57,12 +55,6 @@
               class="mobile-drawer__link"
             >
               <span>Katalog Karya</span>
-            </a>
-          </div>
-
-          <div class="mobile-drawer__actions">
-            <a href="/katalog" @click="closeMobileMenu" class="btn btn-primary btn-lg" style="width: 100%; text-align: center;">
-              Cari Karya
             </a>
           </div>
         </div>
