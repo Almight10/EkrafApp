@@ -4,45 +4,15 @@
     <section class="hero">
       <div class="container">
         <div class="hero__inner">
-          <!-- Left: Headlines, Mobile Photo Stack, & CTAs -->
+          <!-- Left Column on Desktop: Headlines & CTAs -->
           <div class="animate-in hero__content">
-            <h1 class="display-xl" style="margin:0 0 1.25rem;">
-              Rayakan <span class="serif-italic">Kreativitas</span><br>Anak Bangsa
-            </h1>
-            <p class="hero__desc">
-              Platform digital premium untuk mengeksplorasi, mengoleksi, dan merayakan karya terbaik dari 17 sub-sektor ekonomi kreatif Indonesia berbasis Hak Kekayaan Intelektual.
-            </p>
-
-            <!-- POLAROID PHOTO STACK (MOBILE VIEW - POSITIONED BETWEEN DESCRIPTION & CTAS) -->
-            <div class="hero__photo-stack-wrap hero__photo-stack--mobile animate-in delay-200">
-              <div
-                class="hero__photo-stack"
-                @mouseenter="stopTimer"
-                @mouseleave="startTimer"
-              >
-                <div
-                  v-for="(card, idx) in heroCards"
-                  :key="card.id || idx"
-                  :class="['hero__photo-card', getCardSlotClass(idx)]"
-                  @click="handleCardClick(card, idx)"
-                  :title="getCardSlotClass(idx) === 'hero__photo-card--slot-front' ? `Lihat detail ${card.title}` : `Tampilkan ${card.title} ke depan`"
-                >
-                  <div v-if="card.haki" class="hero__photo-badge">✓ HAKI</div>
-                  <img
-                    :src="card.image"
-                    :alt="card.title"
-                    fetchpriority="high"
-                    decoding="async"
-                    width="230"
-                    height="220"
-                    @error="onHeroImgError($event, idx)"
-                  />
-                  <div class="hero__photo-caption">
-                    <span class="hero__photo-title">{{ card.title }}</span>
-                    <span class="hero__photo-sub">{{ card.subSektor }} • 2026</span>
-                  </div>
-                </div>
-              </div>
+            <div class="hero__text-block">
+              <h1 class="display-xl" style="margin:0 0 1.25rem;">
+                Rayakan <span class="serif-italic">Kreativitas</span><br>Anak Bangsa
+              </h1>
+              <p class="hero__desc">
+                Platform digital premium untuk mengeksplorasi, mengoleksi, dan merayakan karya terbaik dari 17 sub-sektor ekonomi kreatif Indonesia berbasis Hak Kekayaan Intelektual.
+              </p>
             </div>
 
             <!-- Hero Action Buttons -->
@@ -52,8 +22,8 @@
             </div>
           </div>
 
-          <!-- Right: Desktop Gallery Polaroid Photo Stack -->
-          <div class="hero__photo-stack-wrap hero__photo-stack--desktop animate-in delay-200">
+          <!-- Right Column on Desktop / Ordered Middle on Mobile: Polaroid Photo Stack -->
+          <div class="hero__photo-stack-wrap animate-in delay-200">
             <div
               class="hero__photo-stack"
               @mouseenter="stopTimer"
@@ -70,7 +40,8 @@
                 <img
                   :src="card.image"
                   :alt="card.title"
-                  fetchpriority="high"
+                  :fetchpriority="getCardSlotClass(idx) === 'hero__photo-card--slot-front' ? 'high' : 'low'"
+                  :loading="getCardSlotClass(idx) === 'hero__photo-card--slot-front' ? 'eager' : 'lazy'"
                   decoding="async"
                   width="230"
                   height="220"
@@ -258,9 +229,9 @@ function setSlide(idx) {
 }
 
 const fallbackArtworks = [
-  'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80'
+  'https://images.unsplash.com/photo-1606760227091-3dd858d97240?auto=format&fit=crop&w=450&q=75&fm=webp',
+  'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?auto=format&fit=crop&w=450&q=75&fm=webp',
+  'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=450&q=75&fm=webp'
 ];
 
 function onHeroImgError(event, idx) {

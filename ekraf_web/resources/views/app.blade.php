@@ -8,10 +8,14 @@
         <meta name="description" content="Katalog Karya Ekonomi Kreatif Daerah Berbasis HAKI">
 
 
-        <!-- Google Fonts (Optimized & Parallel Load) -->
+        <!-- Google Fonts (Optimized Non-Blocking Load) -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript>
+            <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+        </noscript>
 
         <!-- Supabase config injected from env / services config -->
         <script>
