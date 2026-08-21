@@ -124,7 +124,7 @@ const optimizedMainImage = computed(() => {
   const raw = mainImage.value;
   if (!raw) return null;
   if (raw.includes('images.unsplash.com')) {
-    let clean = raw.replace(/w=\d+/, 'w=400').replace(/q=\d+/, 'q=75');
+    let clean = raw.replace(/w=\d+/, 'w=360').replace(/q=\d+/, 'q=70');
     if (!clean.includes('fm=webp')) {
       clean += '&fm=webp';
     }
