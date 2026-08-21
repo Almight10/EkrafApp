@@ -147,7 +147,7 @@
 
         <div v-if="loading" class="spinner"></div>
         <div v-else class="grid-catalog">
-          <ProductCard v-for="produk in newArrivals" :key="produk.id" :produk="produk" :is-new="true" />
+          <ProductCard v-for="(produk, idx) in newArrivals" :key="produk.id" :produk="produk" :is-new="true" :is-priority="idx === 0" />
         </div>
       </div>
     </section>

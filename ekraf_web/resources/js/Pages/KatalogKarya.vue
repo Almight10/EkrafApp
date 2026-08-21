@@ -81,7 +81,7 @@
 
       <div v-else>
         <div class="grid-catalog">
-          <ProductCard v-for="produk in paginatedProduk" :key="produk.id" :produk="produk" />
+          <ProductCard v-for="(produk, idx) in paginatedProduk" :key="produk.id" :produk="produk" :is-priority="idx === 0" />
         </div>
 
         <!-- PAGINATION CONTROLS BANNER -->

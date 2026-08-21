@@ -2,11 +2,12 @@
   <article class="card" @click="goToDetail" style="cursor: pointer;">
     <div style="position: relative; overflow: hidden;">
       <img
-        v-if="mainImage && !imgError"
-        :src="mainImage"
+        v-if="optimizedMainImage && !imgError"
+        :src="optimizedMainImage"
         :alt="produk.usaha?.nama_usaha"
         class="card__img"
-        loading="lazy"
+        :loading="isPriority ? 'eager' : 'lazy'"
+        :fetchpriority="isPriority ? 'high' : 'low'"
         decoding="async"
         width="400"
         height="300"
@@ -79,7 +80,8 @@ import { slugify } from '../dummyData.js';
 
 const props = defineProps({
   produk: { type: Object, required: true },
-  isNew: { type: Boolean, default: false }
+  isNew: { type: Boolean, default: false },
+  isPriority: { type: Boolean, default: false }
 });
 
 const imgError = ref(false);
@@ -116,6 +118,19 @@ const sektorData = computed(() => {
 const mainImage = computed(() => {
   const urls = props.produk.produk?.foto_produk_urls;
   return Array.isArray(urls) && urls.length > 0 ? urls[0] : null;
+});
+
+const optimizedMainImage = computed(() => {
+  const raw = mainImage.value;
+  if (!raw) return null;
+  if (raw.includes('images.unsplash.com')) {
+    let clean = raw.replace(/w=\d+/, 'w=400').replace(/q=\d+/, 'q=75');
+    if (!clean.includes('fm=webp')) {
+      clean += '&fm=webp';
+    }
+    return clean;
+  }
+  return raw;
 });
 
 const hasHaki = computed(() => {
