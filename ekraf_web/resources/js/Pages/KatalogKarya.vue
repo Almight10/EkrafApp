@@ -136,8 +136,8 @@ import SkeletonCard from '../Components/SkeletonCard.vue';
 const searchQuery = ref('');
 const filterSektor = ref('');
 const filterHaki = ref('');
-const loading = ref(true);
-const produkList = ref([]);
+const loading = ref(false);
+const produkList = ref(dummyProducts);
 
 const currentPage = ref(1);
 const itemsPerPage = ref(6);

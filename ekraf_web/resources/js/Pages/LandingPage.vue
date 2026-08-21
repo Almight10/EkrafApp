@@ -177,8 +177,8 @@ import { dummyProducts, slugify } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
 import ProductCard from '../Components/ProductCard.vue';
 
-const loading = ref(true);
-const newArrivals = ref([]);
+const loading = ref(false);
+const newArrivals = ref(dummyProducts.slice(0, 3));
 const stats = ref({ total: '15.000+', haki: '5.000+' });
 const currentSlide = ref(0);
 let slideTimer = null;
