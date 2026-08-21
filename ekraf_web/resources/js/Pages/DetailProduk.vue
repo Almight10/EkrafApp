@@ -1,8 +1,30 @@
 <template>
   <MainLayout>
-    <!-- LOADING -->
-    <div v-if="loading" style="padding:4rem 0;">
-      <div class="spinner"></div>
+    <!-- LOADING SKELETON (ZERO LAYOUT SHIFT) -->
+    <div v-if="loading" class="container" style="padding:3rem 1.5rem 5rem;">
+      <div style="margin-bottom:1.5rem;">
+        <div class="skeleton" style="height:2.5rem;width:55%;margin-bottom:0.75rem;border-radius:4px;"></div>
+        <div class="skeleton" style="height:1.25rem;width:20%;border-radius:4px;"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:3.5rem;align-items:start;" class="detail-layout">
+        <div>
+          <div style="background:#fff;padding:12px;border:1px solid var(--clr-border);box-shadow:4px 4px 0px rgba(28,25,23,0.1);border-radius:2px;">
+            <div class="skeleton" style="width:100%;aspect-ratio:1;border-radius:2px;"></div>
+          </div>
+          <div style="margin-top:2.5rem;background:#ffffff;border:1px solid var(--clr-border);box-shadow:4px 4px 0px rgba(192,72,40,0.15);padding:2rem;border-radius:2px;">
+            <div class="skeleton" style="height:1.5rem;width:45%;margin-bottom:1rem;"></div>
+            <div class="skeleton" style="height:1rem;width:100%;margin-bottom:0.5rem;"></div>
+            <div class="skeleton" style="height:1rem;width:92%;margin-bottom:0.5rem;"></div>
+            <div class="skeleton" style="height:1rem;width:70%;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+          <div class="skeleton" style="height:130px;width:100%;border-radius:4px;"></div>
+          <div class="skeleton" style="height:55px;width:100%;border-radius:4px;"></div>
+          <div class="skeleton" style="height:170px;width:100%;border-radius:4px;"></div>
+          <div class="skeleton" style="height:190px;width:100%;border-radius:4px;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- NOT FOUND -->
@@ -23,7 +45,6 @@
             </h1>
             <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.5rem;flex-wrap:wrap;">
               <span class="badge badge-accent">{{ sektorName }}</span>
-              <!-- <span style="color:var(--clr-muted);font-size:0.95rem;">📍 {{ produk.usaha?.alamat || 'Kota Probolinggo' }}</span> -->
             </div>
           </div>
         </div>
@@ -35,11 +56,13 @@
             <div style="background:#fff;padding:12px;border:1px solid var(--clr-border);box-shadow:4px 4px 0px rgba(28,25,23,0.1);border-radius:2px;">
               <img
                 v-if="activeImage && !hasDetailImgError"
-                :src="activeImage"
+                :src="getOptimizedImg(activeImage, 600)"
                 :alt="produk.usaha?.nama_usaha"
                 class="product-gallery__main"
                 fetchpriority="high"
                 decoding="async"
+                width="600"
+                height="600"
                 @error="onDetailImgError"
               />
               <div v-else style="height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;background:var(--clr-bg-alt);border-radius:2px;color:var(--clr-terracotta);">
@@ -52,12 +75,14 @@
               <img
                 v-for="(img, idx) in images"
                 :key="idx"
-                :src="img"
+                :src="getOptimizedImg(img, 200)"
                 :alt="`Foto ${idx+1}`"
                 class="product-gallery__thumb"
                 :class="{ active: activeImage === img }"
                 loading="lazy"
                 decoding="async"
+                width="76"
+                height="76"
                 @click="activeImage = img"
               />
             </div>
@@ -84,9 +109,13 @@
                 <div class="owner-info-item">
                   <img
                     v-if="ownerPhoto && !hasOwnerPhotoError"
-                    :src="ownerPhoto"
+                    :src="getOptimizedImg(ownerPhoto, 120)"
                     :alt="ownerName"
                     class="product-detail__owner-avatar"
+                    width="44"
+                    height="44"
+                    loading="lazy"
+                    decoding="async"
                     @error="hasOwnerPhotoError = true"
                   />
                   <div
@@ -240,6 +269,18 @@ const hasOwnerPhotoError = ref(false);
 
 function onDetailImgError() {
   hasDetailImgError.value = true;
+}
+
+function getOptimizedImg(url, width = 600) {
+  if (!url) return '';
+  if (url.includes('images.unsplash.com')) {
+    let clean = url.replace(/w=\d+/, `w=${width}`).replace(/q=\d+/, 'q=75');
+    if (!clean.includes('fm=webp')) {
+      clean += '&fm=webp';
+    }
+    return clean;
+  }
+  return url;
 }
 
 const subSektorNames = {
