@@ -123,7 +123,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (timeoutTimer) clearTimeout(timeoutTimer);
   if (removeStartListener) removeStartListener();
   if (removeFinishListener) removeFinishListener();
 });

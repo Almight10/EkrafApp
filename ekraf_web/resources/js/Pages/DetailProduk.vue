@@ -40,7 +40,7 @@
         <!-- HEADER TITLE -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
           <div>
-            <h1 class="display-xl" style="margin:0 0 0.5rem;">
+            <h1 class="display-xl" style="margin:0 0 0.5rem; overflow-wrap: anywhere; word-break: break-word;">
               {{ titleFirst }} <span class="serif-italic">{{ titleRest }}</span>
             </h1>
             <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.5rem;flex-wrap:wrap;">
