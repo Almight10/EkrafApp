@@ -83,7 +83,7 @@
                 decoding="async"
                 width="76"
                 height="76"
-                @click="activeImage = img"
+                @click="selectImage(img)"
               />
             </div>
 
@@ -134,7 +134,12 @@
                 <!-- Item 2: Tahun Berdiri -->
                 <div class="owner-info-item owner-info-item--since">
                   <div class="product-detail__owner-avatar product-detail__owner-avatar--since" aria-hidden="true">
-                    📅
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
                   </div>
                   <div>
                     <div class="product-detail__owner-label">Tahun Berdiri</div>
@@ -146,7 +151,10 @@
               <!-- Bottom Row: Lokasi -->
               <div class="owner-card__bottom" style="background:#ffffff;">
                 <div class="product-detail__owner-avatar product-detail__owner-avatar--location" aria-hidden="true">
-                  📍
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
                 </div>
                 <div>
                   <div class="product-detail__owner-label">Lokasi Usaha</div>
@@ -159,16 +167,31 @@
             <div v-if="hasHaki" class="info-item" style="background:#fceae6;border-color:var(--clr-blush-dark);display:flex;align-items:center;justify-content:space-between;">
               <div>
                 <div class="info-item__label" style="color:var(--clr-terracotta);">Status Legalitas</div>
-                <div class="info-item__value" style="color:var(--clr-terracotta-dark);font-size:1.1rem;">✔ HAKI Terverifikasi</div>
+                <div class="info-item__value" style="color:var(--clr-terracotta-dark);font-size:1.1rem;display:flex;align-items:center;gap:6px;">
+                  <span>HAKI Terverifikasi</span>
+                </div>
               </div>
-              <div style="font-size:1.5rem;">🏅</div>
+              <div style="display:flex;align-items:center;color:var(--clr-terracotta);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
+              </div>
             </div>
             <div v-else class="info-item" style="background:#f3f4f6;border-color:#d1d5db;display:flex;align-items:center;justify-content:space-between;">
               <div>
                 <div class="info-item__label" style="color:#6b7280;">Status Legalitas</div>
-                <div class="info-item__value" style="color:#374151;font-size:1.1rem;">⏳ Belum HAKI</div>
+                <div class="info-item__value" style="color:#374151;font-size:1.1rem;display:flex;align-items:center;gap:6px;">
+                  <span>Belum HAKI</span>
+                </div>
               </div>
-              <div style="font-size:1.5rem;">📋</div>
+              <div style="display:flex;align-items:center;color:#6b7280;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
             </div>
 
             <!-- PRICE & WHATSAPP ORDER BOX (Screenshot 3) -->
@@ -182,9 +205,12 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="btn btn-wa btn-lg"
-                style="width:100%;font-size:1rem;"
+                style="width:100%;font-size:1rem;display:inline-flex;align-items:center;justify-content:center;gap:8px;"
               >
-                💬 Pesan via WhatsApp
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:block;">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.197 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.572-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                <span>Pesan via WhatsApp</span>
               </a>
               <a
                 v-if="produk.produk?.link_marketplace"
@@ -192,9 +218,14 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="btn btn-outline btn-lg"
-                style="width:100%;font-size:1rem;margin-top:0.75rem;"
+                style="width:100%;font-size:1rem;margin-top:0.75rem;display:inline-flex;align-items:center;justify-content:center;gap:8px;"
               >
-                🛒 Beli via Marketplace
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span>Beli via Marketplace</span>
               </a>
               <div style="font-size:0.75rem;color:var(--clr-muted);text-align:center;margin-top:0.5rem;">Tersedia dalam jumlah terbatas</div>
             </div>
@@ -225,7 +256,10 @@
                 </p>
 
                 <div style="display:inline-flex;align-items:center;gap:0.75rem;background:var(--clr-charcoal);color:#fff;padding:8px 16px;border-radius:2px;">
-                  <span style="font-size:1.25rem;">⚙️</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
                   <div style="text-align:left;">
                     <div style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;text-transform:uppercase;">OTENTIKASI DIGITAL EKRAF</div>
                     <div style="font-size:0.65rem;opacity:0.7;">Terverifikasi Resmi Kota Probolinggo</div>
@@ -235,7 +269,13 @@
 
               <!-- IF NO HAKI: SHOW UNVERIFIED / IN-PROGRESS NOTICE BOX -->
               <div v-else style="background:#fafafa;border:2px dashed #cbd5e1;padding:2rem 1.5rem;text-align:center;position:relative;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">📋</div>
+                <div style="display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
                 <div style="font-family:var(--font-serif);font-size:1.1rem;font-weight:700;color:#334155;margin-bottom:0.5rem;">
                   Belum Bersertifikat HAKI
                 </div>
@@ -243,7 +283,12 @@
                   Karya <strong>"{{ produk.usaha?.nama_usaha }}"</strong> belum terdaftar dalam database Hak Kekayaan Intelektual (HAKI) atau sedang dalam proses pengajuan legalitas.
                 </p>
                 <div style="display:inline-flex;align-items:center;gap:0.5rem;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:6px 14px;border-radius:2px;font-size:0.75rem;font-weight:600;font-family:var(--font-mono);">
-                  ℹ️ Fasilitas Pendampingan HAKI Disediakan Dinas Ekraf
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>Fasilitas Pendampingan HAKI Disediakan Dinas Ekraf</span>
                 </div>
               </div>
             </div>
@@ -256,9 +301,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { supabase, isSupabaseConfigured, normalizeEkrafData, enrichOwnerProfilePhoto } from '../supabase.js';
-import { dummyProducts, getDemoItemById, slugify } from '../dummyData.js';
+import { slugify } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
 
 const loading = ref(true);
@@ -270,6 +315,15 @@ const hasOwnerPhotoError = ref(false);
 function onDetailImgError() {
   hasDetailImgError.value = true;
 }
+
+function selectImage(img) {
+  activeImage.value = img;
+  hasDetailImgError.value = false;
+}
+
+watch(activeImage, () => {
+  hasDetailImgError.value = false;
+});
 
 function getOptimizedImg(url, width = 600) {
   if (!url) return '';
@@ -373,34 +427,19 @@ const waLink = computed(() => {
 });
 
 async function loadDetail() {
+  loading.value = true;
+  produk.value = null;
+
   const pathParts = window.location.pathname.split('/');
   const rawParam = pathParts[pathParts.length - 1];
   const param = decodeURIComponent(rawParam).trim();
   const targetSlug = slugify(param);
 
-  // 1. Instant local/demo match for instant visual paint (Frame 1 LCP)
-  const initialMatch = dummyProducts.find(p => {
-    const s = slugify(p.usaha?.nama_usaha || p.title || p.id);
-    return s === targetSlug || p.id === param;
-  }) || dummyProducts[0];
-
-  if (initialMatch) {
-    produk.value = initialMatch;
-    hasOwnerPhotoError.value = false;
-    if (initialMatch.produk?.foto_produk_urls?.length > 0) {
-      activeImage.value = initialMatch.produk.foto_produk_urls[0];
-    }
-    loading.value = false; // Instant paint
-  }
-
   if (!isSupabaseConfigured) {
-    enrichOwnerProfilePhoto(produk.value).then(enriched => {
-      if (enriched) produk.value = enriched;
-    });
+    loading.value = false;
     return;
   }
 
-  // 2. Background Revalidation from Supabase
   try {
     const { data: list, error } = await supabase
       .from('ekraf_data')
@@ -442,6 +481,7 @@ async function loadDetail() {
     if (matchedRow) {
       const normalized = normalizeEkrafData(matchedRow);
       produk.value = normalized;
+      hasDetailImgError.value = false;
       hasOwnerPhotoError.value = false;
       if (normalized.produk?.foto_produk_urls?.length > 0) {
         activeImage.value = normalized.produk.foto_produk_urls[0];
@@ -449,9 +489,12 @@ async function loadDetail() {
       enrichOwnerProfilePhoto(normalized).then(enriched => {
         if (enriched) produk.value = enriched;
       });
+    } else {
+      produk.value = null;
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat detail:', err?.message || err);
+    produk.value = null;
   } finally {
     loading.value = false;
   }

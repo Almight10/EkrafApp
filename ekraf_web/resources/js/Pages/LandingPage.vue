@@ -68,7 +68,7 @@
           </div>
           <div>
             <div class="hero__stat-value">{{ stats.haki }}</div>
-            <div class="hero__stat-label">Karya Terkurasi</div>
+            <div class="hero__stat-label">Karya Terdaftar HAKI</div>
           </div>
         </div>
       </div>
@@ -173,18 +173,18 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { supabase, isSupabaseConfigured, normalizeEkrafData, isApprovedEkrafData } from '../supabase.js';
-import { dummyProducts, slugify } from '../dummyData.js';
+import { slugify } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
 import ProductCard from '../Components/ProductCard.vue';
 
-const loading = ref(false);
-const newArrivals = ref(dummyProducts.slice(0, 3));
-const stats = ref({ total: '15.000+', haki: '5.000+' });
+const loading = ref(true);
+const newArrivals = ref([]);
+const stats = ref({ total: '...', haki: '...' });
 const currentSlide = ref(0);
 let slideTimer = null;
 
 const heroCards = computed(() => {
-  const list = newArrivals.value.length > 0 ? newArrivals.value : dummyProducts;
+  const list = newArrivals.value;
   return list.slice(0, 3).map((item, idx) => ({
     id: item.id,
     title: item.usaha?.nama_usaha || 'Karya Ekraf',
@@ -250,14 +250,12 @@ function openCardDetail(card) {
 
 function handleCardClick(card, idx) {
   const slotClass = getCardSlotClass(idx);
-  console.log('[Card Click] idx:', idx, 'slot:', slotClass, 'currentSlide:', currentSlide.value);
   if (slotClass === 'hero__photo-card--slot-front') {
     openCardDetail(card);
   } else {
     currentSlide.value = idx;
     stopTimer();
     setTimeout(() => startTimer(), 100);
-    console.log('[Card Click] new currentSlide:', currentSlide.value);
   }
 }
 
@@ -270,15 +268,16 @@ function goToKatalog(id) {
 }
 
 async function loadData() {
+  loading.value = true;
+  newArrivals.value = [];
+
   if (!isSupabaseConfigured) {
-    console.warn('[Ekraf] Supabase belum dikonfigurasi — menggunakan data demo.');
-    newArrivals.value = dummyProducts.slice(0, 6);
+    stats.value = { total: '0+', haki: '0+' };
     loading.value = false;
     return;
   }
 
   try {
-    // Fetch latest products with user location via join with public.users
     const { data, error } = await supabase
       .from('ekraf_data')
       .select('*, users:user_id(nama_lengkap, no_hp, alamat, kecamatan, kelurahan, foto_url)')
@@ -289,34 +288,22 @@ async function loadData() {
     if (data && data.length > 0) {
       const approvedData = data.filter(isApprovedEkrafData);
       if (approvedData.length > 0) {
-        newArrivals.value = approvedData.slice(0, 6).map(normalizeEkrafData);
+        const normalized = approvedData.map(normalizeEkrafData);
+        newArrivals.value = normalized.slice(0, 6);
+        const hakiCount = normalized.filter(item => !!(item.legalitas?.no_sertifikat_haki)).length;
+        stats.value = {
+          total: `${normalized.length}+`,
+          haki: `${hakiCount}+`
+        };
       } else {
-        newArrivals.value = dummyProducts.slice(0, 6);
+        stats.value = { total: '0+', haki: '0+' };
       }
     } else {
-      newArrivals.value = dummyProducts.slice(0, 6);
-    }
-
-    // Fetch total count for stats banner
-    const { count } = await supabase
-      .from('ekraf_data')
-      .select('*', { count: 'exact', head: true });
-
-    const { count: hakiCount } = await supabase
-      .from('ekraf_data')
-      .select('*', { count: 'exact', head: true })
-      .not('nomor_haki', 'is', null)
-      .neq('nomor_haki', '');
-
-    if (count) {
-      stats.value = {
-        total: count.toLocaleString('id-ID') + '+',
-        haki: (hakiCount || 0).toLocaleString('id-ID') + '+',
-      };
+      stats.value = { total: '0+', haki: '0+' };
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat data Supabase:', err?.message || err);
-    newArrivals.value = dummyProducts.slice(0, 6);
+    stats.value = { total: '0+', haki: '0+' };
   } finally {
     loading.value = false;
   }

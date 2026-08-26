@@ -27,6 +27,14 @@ class EkrafController extends Controller
     }
 
     /**
+     * Dashboard Data Sektor — pemetaan & statistik 17 sub-sektor
+     */
+    public function dashboard(): Response
+    {
+        return Inertia::render('DashboardSektor');
+    }
+
+    /**
      * Detail Produk — halaman detail satu karya berdasarkan Firestore document ID
      */
     public function show(string $id): Response

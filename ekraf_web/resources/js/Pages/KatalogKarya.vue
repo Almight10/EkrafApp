@@ -5,11 +5,16 @@
       <div class="container">
         <div class="katalog-header__top">
           <div>
-            <h1 class="display-xl" style="margin:0 0 0.5rem;">Explore the <span class="serif-italic">Collection</span></h1>
-            <p style="color:var(--clr-muted);font-size:0.95rem;margin:0;">Jelajahi dan apresiasi portofolio karya kreatif terverifikasi HAKI seluruh daerah.</p>
+            <h1 class="display-xl" style="margin:0 0 0.5rem;">Eksplor <span class="serif-italic">Ekraf</span></h1>
+            <p style="color:var(--clr-muted);font-size:0.95rem;margin:0;">Jelajahi portofolio karya kreatif dan profil pelaku usaha terverifikasi seluruh daerah.</p>
           </div>
           <div class="search-wrap">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
             <input
               v-model="searchQuery"
               type="text"
@@ -128,7 +133,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { supabase, isSupabaseConfigured, normalizeEkrafData, isApprovedEkrafData } from '../supabase.js';
-import { dummyProducts } from '../dummyData.js';
 import MainLayout from '../Layouts/MainLayout.vue';
 import ProductCard from '../Components/ProductCard.vue';
 import SkeletonCard from '../Components/SkeletonCard.vue';
@@ -136,8 +140,8 @@ import SkeletonCard from '../Components/SkeletonCard.vue';
 const searchQuery = ref('');
 const filterSektor = ref('');
 const filterHaki = ref('');
-const loading = ref(false);
-const produkList = ref(dummyProducts);
+const produkList = ref([]);
+const loading = ref(true);
 
 const currentPage = ref(1);
 const itemsPerPage = ref(6);
@@ -252,6 +256,9 @@ function resetFilter() {
 }
 
 async function loadProduk() {
+  loading.value = true;
+  produkList.value = [];
+
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
     const sektorParam = params.get('sektor');
@@ -268,8 +275,6 @@ async function loadProduk() {
   }
 
   if (!isSupabaseConfigured) {
-    console.warn('[Ekraf] Supabase belum dikonfigurasi — menggunakan data demo.');
-    produkList.value = dummyProducts;
     loading.value = false;
     return;
   }
@@ -283,22 +288,13 @@ async function loadProduk() {
     if (error) throw error;
 
     if (data && data.length > 0) {
-      // Filter ONLY approved / ACC entries from admin
       const approvedData = data.filter(isApprovedEkrafData);
       if (approvedData.length > 0) {
         produkList.value = approvedData.map(normalizeEkrafData);
-      } else {
-        console.info('[Ekraf] Belum ada data terverifikasi — menggunakan data demo.');
-        produkList.value = dummyProducts;
       }
-      console.info(`[Ekraf] Loaded ${approvedData.length} verified records from Supabase.`);
-    } else {
-      console.info('[Ekraf] Tabel kosong — menggunakan data demo.');
-      produkList.value = dummyProducts;
     }
   } catch (err) {
     console.error('[Ekraf] Gagal memuat data Supabase:', err?.message || err);
-    produkList.value = dummyProducts;
   } finally {
     loading.value = false;
   }

@@ -15,6 +15,9 @@ Route::get('/', [EkrafController::class, 'index'])->name('home');
 // Katalog Karya — filterable grid
 Route::get('/katalog', [EkrafController::class, 'katalog'])->name('katalog');
 
+// Dashboard Data Sektor — dedicated analytics page
+Route::get('/dashboard', [EkrafController::class, 'dashboard'])->name('dashboard');
+
 // Detail Produk — single product page (supports both /detail/{id} and /produk/{id})
 Route::get('/detail/{id}', [EkrafController::class, 'show'])->name('detail.show');
 Route::get('/produk/{id}', [EkrafController::class, 'show'])->name('produk.show');

@@ -6,15 +6,16 @@
     <!-- NAVBAR (Editorial Gallery Header) -->
     <nav class="navbar">
       <div class="container navbar__inner">
-        <a href="/" class="navbar__brand" @click="closeMobileMenu">
+        <Link href="/" class="navbar__brand" @click="closeMobileMenu">
           <span>Kreasi</span>
           <span class="navbar__brand-badge">EKRAF Probolinggo</span>
-        </a>
+        </Link>
 
         <!-- Desktop Navigation Links -->
         <ul class="navbar__links navbar__links--desktop">
-          <li><a href="/" :class="{ active: currentPath === '/' || currentPath === '' }">Beranda</a></li>
-          <li><a href="/katalog" :class="{ active: currentPath.startsWith('/katalog') || currentPath.startsWith('/detail') }">Katalog Karya</a></li>
+          <li><Link href="/" :class="{ active: currentPath === '/' || currentPath === '' }">Beranda</Link></li>
+          <li><Link href="/katalog" :class="{ active: currentPath.startsWith('/katalog') || currentPath.startsWith('/detail') }">Eksplor Ekraf</Link></li>
+          <li><Link href="/dashboard" :class="{ active: currentPath.startsWith('/dashboard') }">Dashboard Data</Link></li>
         </ul>
 
         <!-- Desktop Actions -->
@@ -40,22 +41,30 @@
       <transition name="mobile-menu-slide">
         <div v-if="isMobileMenuOpen" class="mobile-drawer">
           <div class="mobile-drawer__links">
-            <a
+            <Link
               href="/"
               :class="{ active: currentPath === '/' || currentPath === '' }"
               @click="closeMobileMenu"
               class="mobile-drawer__link"
             >
               <span>Beranda</span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/katalog"
               :class="{ active: currentPath.startsWith('/katalog') || currentPath.startsWith('/detail') }"
               @click="closeMobileMenu"
               class="mobile-drawer__link"
             >
-              <span>Katalog Karya</span>
-            </a>
+              <span>Eksplor Ekraf</span>
+            </Link>
+            <Link
+              href="/dashboard"
+              :class="{ active: currentPath.startsWith('/dashboard') }"
+              @click="closeMobileMenu"
+              class="mobile-drawer__link"
+            >
+              <span>Dashboard Data</span>
+            </Link>
           </div>
         </div>
       </transition>
@@ -85,18 +94,18 @@
         <div>
           <div style="font-family:var(--font-mono);font-weight:700;font-size:0.75rem;text-transform:uppercase;color:var(--clr-charcoal);margin-bottom:0.75rem;">Sub-Sektor Utama</div>
           <ul class="footer__links">
-            <li><a href="/katalog?sektor=kuliner">Kuliner</a></li>
-            <li><a href="/katalog?sektor=kriya">Kriya</a></li>
-            <li><a href="/katalog?sektor=fesyen">Fashion</a></li>
-            <li><a href="/katalog?sektor=seni-rupa">Seni Rupa</a></li>
-            <li><a href="/katalog?sektor=film">Film, Animasi & Video</a></li>
+            <li><Link href="/katalog?sektor=kuliner">Kuliner</Link></li>
+            <li><Link href="/katalog?sektor=kriya">Kriya</Link></li>
+            <li><Link href="/katalog?sektor=fesyen">Fashion</Link></li>
+            <li><Link href="/katalog?sektor=seni-rupa">Seni Rupa</Link></li>
+            <li><Link href="/katalog?sektor=film">Film, Animasi & Video</Link></li>
           </ul>
         </div>
         <div>
           <div style="font-family:var(--font-mono);font-weight:700;font-size:0.75rem;text-transform:uppercase;color:var(--clr-charcoal);margin-bottom:0.75rem;">Pusat Bantuan</div>
           <ul class="footer__links">
             <li><a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer">Download Aplikasi Kreator</a></li>
-            <li><a href="#">Hubungi Dinas Ekraf</a></li>
+            <li><a href="#">Hubungi Dinas Kepemudaan Olahraga dan Pariwisata Kota Probolinggo</a></li>
           </ul>
         </div>
       </div>
@@ -133,15 +142,8 @@ function toggleMobileMenu() {
 function closeMobileMenu() {
   isMobileMenuOpen.value = false;
 }
-
-function testLoading() {
-  if (typeof window !== 'undefined' && window.triggerEkrafLoader) {
-    window.triggerEkrafLoader(1500);
-  }
-}
-
-function handleTestLoadingMobile() {
-  closeMobileMenu();
-  testLoading();
-}
 </script>
+
+<style scoped>
+/* Additional component-specific scopes if needed */
+</style>
