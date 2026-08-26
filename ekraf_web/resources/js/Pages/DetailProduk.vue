@@ -1,12 +1,12 @@
 <template>
   <MainLayout>
     <!-- LOADING SKELETON (ZERO LAYOUT SHIFT) -->
-    <div v-if="loading" class="container" style="padding:3rem 1.5rem 5rem;">
+    <div v-if="loading" class="container detail-container">
       <div style="margin-bottom:1.5rem;">
         <div class="skeleton" style="height:2.5rem;width:55%;margin-bottom:0.75rem;border-radius:4px;"></div>
         <div class="skeleton" style="height:1.25rem;width:20%;border-radius:4px;"></div>
       </div>
-      <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:3.5rem;align-items:start;" class="detail-layout">
+      <div class="detail-layout">
         <div>
           <div style="background:#fff;padding:12px;border:1px solid var(--clr-border);box-shadow:4px 4px 0px rgba(28,25,23,0.1);border-radius:2px;">
             <div class="skeleton" style="width:100%;aspect-ratio:1;border-radius:2px;"></div>
@@ -36,9 +36,9 @@
 
     <!-- DETAIL PRODUK CONTENT -->
     <div v-else>
-      <div class="container" style="padding:3rem 1.5rem 5rem;">
+      <div class="container detail-container">
         <!-- HEADER TITLE -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+        <div class="detail-header">
           <div>
             <h1 class="display-xl" style="margin:0 0 0.5rem; overflow-wrap: anywhere; word-break: break-word;">
               {{ titleFirst }} <span class="serif-italic">{{ titleRest }}</span>
@@ -49,7 +49,7 @@
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:3.5rem;align-items:start;" class="detail-layout">
+        <div class="detail-layout">
 
           <!-- LEFT: GALLERY STACK -->
           <div class="animate-in">
@@ -88,7 +88,7 @@
             </div>
 
             <!-- DESKRIPSI USAHA BOX (DI BAWAH GAMBAR) -->
-            <div style="margin-top:2.5rem;background:#ffffff;border:1px solid var(--clr-border);box-shadow:4px 4px 0px rgba(192,72,40,0.15);padding:2rem;border-radius:2px;">
+            <div class="detail-desc-box">
               <div style="font-family:var(--font-serif);font-size:1.35rem;font-weight:800;color:var(--clr-charcoal);margin-bottom:1rem;">
                 Deskripsi Usaha & Karya
               </div>
