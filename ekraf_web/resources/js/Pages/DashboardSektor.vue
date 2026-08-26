@@ -114,7 +114,13 @@
                     class="region-compact-item"
                   >
                     <div class="region-compact-item__top">
-                      <span>📍 {{ kec.name }}</span>
+                      <span class="region-name">
+                        <svg class="region-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                          <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        {{ kec.name }}
+                      </span>
                       <span class="region-compact-item__val">
                         {{ loading ? '...' : `${kec.count} Usaha (${kec.percentage}%)` }}
                       </span>
@@ -566,10 +572,23 @@ function goToKatalog(sectorId) {
 
 .region-compact-item__top {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   font-size: 0.8rem;
   font-weight: 600;
   margin-bottom: 3px;
+}
+
+.region-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--clr-charcoal);
+}
+
+.region-icon {
+  color: var(--clr-terracotta);
+  flex-shrink: 0;
 }
 
 .region-compact-item__val {
