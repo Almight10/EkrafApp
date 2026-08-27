@@ -614,6 +614,13 @@ a { text-decoration: none; color: inherit; }
   100% { top: -14px; }
 }
 
+@keyframes heroCardFloatYMobile {
+  0%   { top: 50%; }
+  40%  { top: calc(50% - 10px); }
+  70%  { top: calc(50% - 5px); }
+  100% { top: calc(50% - 14px); }
+}
+
 .hero__photo-caption {
   margin-top: 8px;
   display: flex;
@@ -1602,7 +1609,7 @@ a { text-decoration: none; color: inherit; }
     width: 190px;
     padding: 8px 8px 18px 8px;
     top: 50%;
-    animation: none; /* disable float animation on mobile — avoids top offset CPU spikes */
+    animation-name: heroCardFloatYMobile;
   }
   .hero__photo-card img {
     height: 160px;
