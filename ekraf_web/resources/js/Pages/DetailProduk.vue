@@ -472,8 +472,7 @@ const waLink = computed(() => {
   const phone = produk.value?.identitas?.no_wa || produk.value?.users?.no_hp || '6281234567890';
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   const formattedPhone = cleanPhone.startsWith('0') ? '62' + cleanPhone.slice(1) : cleanPhone;
-  const text = encodeURIComponent(`Halo, saya tertarik dengan karya "${produk.value?.usaha?.nama_usaha || 'Ekraf'}" di Platform Ekraf Kota Probolinggo.`);
-  return `https://wa.me/${formattedPhone}?text=${text}`;
+  return `https://wa.me/${formattedPhone}`;
 });
 
 async function loadDetail() {
