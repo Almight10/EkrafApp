@@ -165,10 +165,10 @@ const formattedPrice = computed(() => {
 });
 
 const waLink = computed(() => {
-  const phone = props.produk.identitas?.no_wa || '6281234567890';
+  const phone = props.produk.identitas?.no_wa || props.produk.users?.no_hp || '6281234567890';
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   const formattedPhone = cleanPhone.startsWith('0') ? '62' + cleanPhone.slice(1) : cleanPhone;
-  const text = encodeURIComponent(`Halo, saya tertarik dengan karya "${props.produk.usaha?.nama_usaha || 'Ekraf'}" di Platform Ekraf Kota Probolinggo.`);
+  const text = encodeURIComponent(`Halo, saya tertarik dengan "${props.produk.usaha?.nama_usaha || 'Ekraf'}" di Platform Ekraf Kota Probolinggo.`);
   return `https://wa.me/${formattedPhone}?text=${text}`;
 });
 
