@@ -92,11 +92,16 @@ const props = defineProps({
   }
 });
 
-const isLoading = ref(false);
+const isLoading = ref(true);
 let removeStartListener = null;
 let removeFinishListener = null;
 
 onMounted(() => {
+  // Hide initial page refresh preloader after smooth 700ms branding animation
+  setTimeout(() => {
+    isLoading.value = false;
+  }, props.initialLoadingDuration);
+
   // Allow manually triggering animation for demo/testing
   if (typeof window !== 'undefined') {
     window.triggerEkrafLoader = (ms = 1500) => {
@@ -118,7 +123,7 @@ onMounted(() => {
   removeFinishListener = router.on('finish', () => {
     setTimeout(() => {
       isLoading.value = false;
-    }, 100);
+    }, 200);
   });
 });
 

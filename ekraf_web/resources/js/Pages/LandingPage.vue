@@ -270,6 +270,7 @@ function goToKatalog(id) {
 async function loadData() {
   loading.value = true;
   newArrivals.value = [];
+  const startTime = Date.now();
 
   if (!isSupabaseConfigured) {
     stats.value = { total: '0+', haki: '0+' };
@@ -305,6 +306,9 @@ async function loadData() {
     console.error('[Ekraf] Gagal memuat data Supabase:', err?.message || err);
     stats.value = { total: '0+', haki: '0+' };
   } finally {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, 500 - elapsed);
+    if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
     loading.value = false;
   }
 }

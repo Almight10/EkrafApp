@@ -270,7 +270,8 @@ const topActiveSectors = computed(() => subSektorDistribution.value.filter(s => 
 
 async function loadDashboardData() {
   loading.value = true;
-  allEkrafItems.value = []; // Reset empty
+  allEkrafItems.value = [];
+  const startTime = Date.now();
 
   if (!isSupabaseConfigured) {
     loading.value = false;
@@ -293,6 +294,9 @@ async function loadDashboardData() {
   } catch (err) {
     console.warn('[DashboardPage] Supabase fetch error:', err?.message || err);
   } finally {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, 500 - elapsed);
+    if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
     loading.value = false;
   }
 }

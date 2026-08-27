@@ -88,6 +88,8 @@ a { text-decoration: none; color: inherit; }
 .display-xl {
   font-family: var(--font-serif);
   font-size: clamp(2rem, 5vw, 3.5rem);
+  overflow-wrap: anywhere;
+  word-break: break-word;
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -1297,6 +1299,86 @@ a { text-decoration: none; color: inherit; }
 .empty-state { text-align: center; padding: 3rem 1rem; color: var(--clr-muted); }
 .empty-state__icon { font-size: 2.5rem; margin-bottom: 1rem; }
 
+/* ── DETAIL NOT FOUND (Premium Card) ── */
+.detail-notfound-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 3rem 1.25rem;
+}
+.detail-notfound-card {
+  position: relative;
+  background: #ffffff;
+  border: 1.5px solid var(--clr-border);
+  box-shadow: 6px 6px 0px rgba(192, 72, 40, 0.12);
+  border-radius: 4px;
+  padding: 3rem 2.5rem 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  animation: fadeInUp 0.5s ease both;
+}
+.detail-notfound-corner {
+  position: absolute;
+  font-size: 0.65rem;
+  color: var(--clr-blush-dark);
+  line-height: 1;
+}
+.detail-notfound-corner--tl { top: 10px; left: 12px; }
+.detail-notfound-corner--tr { top: 10px; right: 12px; }
+.detail-notfound-corner--bl { bottom: 10px; left: 12px; }
+.detail-notfound-corner--br { bottom: 10px; right: 12px; }
+.detail-notfound-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  animation: notfoundPulse 3s ease-in-out infinite;
+}
+@keyframes notfoundPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.detail-notfound-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--clr-terracotta-soft);
+  color: var(--clr-terracotta);
+  border: 1px solid var(--clr-blush-dark);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  margin-bottom: 1.25rem;
+}
+.detail-notfound-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  color: var(--clr-charcoal);
+  line-height: 1.25;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+}
+.detail-notfound-desc {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--clr-muted);
+  line-height: 1.7;
+  margin: 0 0 2rem;
+}
+.detail-notfound-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 /* ── FOOTER (Warm Blush Cream Footer) ── */
 .footer {
   width: 100%;
@@ -1678,6 +1760,10 @@ a { text-decoration: none; color: inherit; }
   grid-template-columns: 1.1fr 0.9fr;
   gap: 3.5rem;
   align-items: start;
+}
+.detail-layout > * {
+  min-width: 0;
+  overflow: hidden;
 }
 .detail-desc-box {
   margin-top: 2rem;

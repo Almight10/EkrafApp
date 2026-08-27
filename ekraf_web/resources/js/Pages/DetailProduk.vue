@@ -1,6 +1,6 @@
 <template>
   <MainLayout>
-    <!-- LOADING SKELETON (ZERO LAYOUT SHIFT) -->
+    <!-- LOADING SKELETON -->
     <div v-if="loading" class="container detail-container">
       <div style="margin-bottom:1.5rem;">
         <div class="skeleton" style="height:2.5rem;width:55%;margin-bottom:0.75rem;border-radius:4px;"></div>
@@ -28,10 +28,60 @@
     </div>
 
     <!-- NOT FOUND -->
-    <div v-else-if="!produk" class="empty-state" style="padding:5rem 1rem;">
-      <div class="empty-state__icon">😕</div>
-      <h2 style="color:var(--clr-charcoal);font-family:var(--font-serif);">Produk tidak ditemukan</h2>
-      <a href="/katalog" class="btn btn-primary" style="margin-top:1rem;">Kembali ke Katalog</a>
+    <div v-else-if="!loading && !produk" class="detail-notfound-wrap">
+      <div class="detail-notfound-card">
+        <!-- Decorative corner marks -->
+        <div class="detail-notfound-corner detail-notfound-corner--tl">✦</div>
+        <div class="detail-notfound-corner detail-notfound-corner--tr">✦</div>
+        <div class="detail-notfound-corner detail-notfound-corner--bl">✦</div>
+        <div class="detail-notfound-corner detail-notfound-corner--br">✦</div>
+
+        <!-- SVG Illustration -->
+        <div class="detail-notfound-icon-wrap">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Outer dashed ring -->
+            <circle cx="36" cy="36" r="34" stroke="var(--clr-border)" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <!-- Inner filled circle -->
+            <circle cx="36" cy="36" r="26" fill="var(--clr-blush)" stroke="var(--clr-blush-dark)" stroke-width="1.5"/>
+            <!-- Search glass body — centered at (33,33) -->
+            <circle cx="33" cy="33" r="10" stroke="var(--clr-terracotta)" stroke-width="2.5"/>
+            <!-- Search handle — extends bottom-right -->
+            <line x1="40.5" y1="40.5" x2="47.5" y2="47.5" stroke="var(--clr-terracotta)" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- X inside glass — centered at (33,33) -->
+            <line x1="29" y1="29" x2="37" y2="37" stroke="var(--clr-terracotta)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="37" y1="29" x2="29" y2="37" stroke="var(--clr-terracotta)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Label chip -->
+        <div class="detail-notfound-chip">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          INFORMASI
+        </div>
+
+        <!-- Heading -->
+        <h2 class="detail-notfound-title">
+          Karya Tidak<br/>
+          <span class="serif-italic" style="color:var(--clr-terracotta);">Ditemukan</span>
+        </h2>
+
+        <!-- Sub text -->
+        <p class="detail-notfound-desc">
+          Karya yang Anda cari tidak tersedia atau alamat URL tidak sesuai.
+        </p>
+
+        <!-- Actions -->
+        <div class="detail-notfound-actions">
+          <a href="/katalog" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Jelajahi Katalog
+          </a>
+          <a href="/" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Ke Beranda
+          </a>
+        </div>
+      </div>
     </div>
 
     <!-- DETAIL PRODUK CONTENT -->
@@ -429,6 +479,7 @@ const waLink = computed(() => {
 async function loadDetail() {
   loading.value = true;
   produk.value = null;
+  const startTime = Date.now();
 
   const pathParts = window.location.pathname.split('/');
   const rawParam = pathParts[pathParts.length - 1];
@@ -467,15 +518,6 @@ async function loadDetail() {
           return candidates.some(c => c && slugify(c) === targetSlug);
         });
       }
-
-      if (!matchedRow) {
-        matchedRow = list.find(row => {
-          const norm = normalizeEkrafData(row);
-          const name = (norm.usaha?.nama_usaha || row.nama_brand || row.nama_usaha || '').toLowerCase();
-          const cleanParam = param.toLowerCase().replace(/-/g, ' ');
-          return name && cleanParam && (name.includes(cleanParam) || cleanParam.includes(name));
-        });
-      }
     }
 
     if (matchedRow) {
@@ -496,6 +538,9 @@ async function loadDetail() {
     console.error('[Ekraf] Gagal memuat detail:', err?.message || err);
     produk.value = null;
   } finally {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, 500 - elapsed);
+    if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
     loading.value = false;
   }
 }

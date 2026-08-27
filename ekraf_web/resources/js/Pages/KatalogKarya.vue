@@ -258,6 +258,7 @@ function resetFilter() {
 async function loadProduk() {
   loading.value = true;
   produkList.value = [];
+  const startTime = Date.now();
 
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
@@ -296,6 +297,9 @@ async function loadProduk() {
   } catch (err) {
     console.error('[Ekraf] Gagal memuat data Supabase:', err?.message || err);
   } finally {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, 500 - elapsed);
+    if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
     loading.value = false;
   }
 }
