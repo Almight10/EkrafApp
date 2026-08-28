@@ -30,6 +30,9 @@ dependencies:
   csv: ^6.0.0
   excel: ^4.0.6
   file_picker: ^8.0.0
+  flutter_image_compress: ^2.5.1
+  internet_connection_checker_plus: ^3.1.1
+  package_info_plus: ^9.0.1
 
 
 
@@ -37,7 +40,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-  flutter_native_splash: ^2.4.1
   flutter_launcher_icons: ^0.13.1
 
 flutter:
@@ -45,15 +47,6 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-
-flutter_native_splash:
-  background_image: assets/images/splash_bg.png
-  image: assets/images/logo_dispopar_symbol.png
-  android: true
-  ios: true
-  android_12:
-    image: assets/images/logo_dispopar_symbol.png
-    color: "#001C39"
 
 flutter_launcher_icons:
   android: "launcher_icon"

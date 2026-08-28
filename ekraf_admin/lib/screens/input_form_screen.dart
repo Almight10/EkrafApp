@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 import '../models/ekraf_data.dart';
@@ -65,22 +66,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Pilih 1 Foto dari Galeri'),
-              onTap: () async {
-                Navigator.of(context).pop();
-                final picked = await _picker.pickImage(
-                    source: ImageSource.gallery, imageQuality: 70);
-                if (picked != null) {
-                  setState(() {
-                    _allProductImages.add(File(picked.path));
-                  });
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_rounded),
-              title: Text(
-                  'Pilih Banyak Foto dari Galeri (sisa $remaining foto)'),
+              title: Text('Pilih Foto dari Galeri (Maks $remaining foto)'),
               subtitle: Text(
                   'Maks $_maxProductImages foto. Sudah dipilih: ${_allProductImages.length}'),
               onTap: () async {
@@ -123,6 +109,11 @@ class _InputFormScreenState extends State<InputFormScreen> {
   final _tahunBerdiriController = TextEditingController();
   final _karyawanController = TextEditingController();
   String? _selectedOmzet;
+  bool _alamatUsahaSamaDenganDomisili = true;
+  final _alamatUsahaController = TextEditingController();
+  String? _selectedKecamatanUsaha;
+  String? _selectedKelurahanUsaha;
+  final _mapsUrlController = TextEditingController();
 
   // Step 3 - Legalitas (HAKI)
   final Set<HakiType> _selectedHaki = {HakiType.belumAda};
@@ -153,6 +144,17 @@ class _InputFormScreenState extends State<InputFormScreen> {
       _tahunBerdiriController.text = d.tahunBerdiri;
       _karyawanController.text = d.jumlahKaryawan.toString();
       _selectedOmzet = d.omzetPerBulan.isEmpty ? null : d.omzetPerBulan;
+
+      if (d.alamatUsaha != null && d.alamatUsaha!.trim().isNotEmpty) {
+        _alamatUsahaController.text = d.alamatUsaha!;
+        _selectedKecamatanUsaha = d.kecamatanUsaha;
+        _selectedKelurahanUsaha = d.kelurahanUsaha;
+        _mapsUrlController.text = d.mapsUrl ?? '';
+        if (d.alamatUsaha != d.alamat ||
+            (d.kecamatanUsaha != null && d.kecamatanUsaha != d.kecamatan)) {
+          _alamatUsahaSamaDenganDomisili = false;
+        }
+      }
 
       _selectedHaki.clear();
       _selectedHaki.addAll(d.hakiTypes);
@@ -195,6 +197,8 @@ class _InputFormScreenState extends State<InputFormScreen> {
     _deskripsiController.dispose();
     _tahunBerdiriController.dispose();
     _karyawanController.dispose();
+    _alamatUsahaController.dispose();
+    _mapsUrlController.dispose();
     _nomorHakiController.dispose();
     _tahunHakiController.dispose();
     _namaProdukController.dispose();
@@ -577,6 +581,149 @@ class _InputFormScreenState extends State<InputFormScreen> {
             validator: (v) => v == null ? 'Pilih rentang omzet' : null,
           ),
         ),
+        const SizedBox(height: 16),
+        _buildFieldContainer(
+          label: 'Lokasi & Alamat Tempat Usaha (Workshop/Galeri/Toko)',
+          sensitivity: _Sensitivity.publik,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _alamatUsahaSamaDenganDomisili
+                        ? AppColors.primary.withValues(alpha: 0.3)
+                        : AppColors.outlineVariant,
+                  ),
+                ),
+                child: SwitchListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  activeTrackColor: AppColors.primary,
+                  activeThumbColor: Colors.white,
+                  title: Text(
+                    'Alamat Usaha sama dengan Domisili Pemilik',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  subtitle: Text(
+                    _alamatUsahaSamaDenganDomisili
+                        ? 'Menggunakan alamat domisili pemilik di Step 1 sebagai lokasi usaha.'
+                        : 'Usaha/workshop beroperasi di lokasi berbeda dari alamat rumah.',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  value: _alamatUsahaSamaDenganDomisili,
+                  onChanged: (val) {
+                    setState(() {
+                      _alamatUsahaSamaDenganDomisili = val;
+                    });
+                  },
+                ),
+              ),
+              if (!_alamatUsahaSamaDenganDomisili) ...[
+                const SizedBox(height: 16),
+                _buildField(
+                  controller: _alamatUsahaController,
+                  hint: 'Alamat lengkap tempat usaha/workshop (Jl, No, RT/RW)...',
+                  icon: Icons.store_mall_directory_outlined,
+                  maxLines: 2,
+                  validator: (v) {
+                    if (!_alamatUsahaSamaDenganDomisili && (v == null || v.trim().isEmpty)) {
+                      return 'Alamat usaha wajib diisi jika berbeda dari domisili';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedKecamatanUsaha,
+                  items: () {
+                    final List<String> effectiveList = List<String>.from(kecamatanList);
+                    if (_selectedKecamatanUsaha != null && !effectiveList.contains(_selectedKecamatanUsaha)) {
+                      effectiveList.add(_selectedKecamatanUsaha!);
+                    }
+                    return effectiveList
+                        .map((s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(s, style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14)),
+                            ))
+                        .toList();
+                  }(),
+                  onChanged: (v) {
+                    setState(() {
+                      _selectedKecamatanUsaha = v;
+                      _selectedKelurahanUsaha = null;
+                    });
+                  },
+                  validator: (v) {
+                    if (!_alamatUsahaSamaDenganDomisili && v == null) {
+                      return 'Pilih kecamatan lokasi usaha';
+                    }
+                    return null;
+                  },
+                  dropdownColor: AppColors.surface,
+                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
+                  decoration: const InputDecoration(
+                    hintText: 'Pilih Kecamatan Lokasi Usaha',
+                    prefixIcon: Icon(Icons.location_city_outlined),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedKelurahanUsaha,
+                  items: () {
+                    final List<String> rawKelurahan = probolinggoData[_selectedKecamatanUsaha] ?? [];
+                    final List<String> effectiveList = List<String>.from(rawKelurahan);
+                    if (_selectedKelurahanUsaha != null && !effectiveList.contains(_selectedKelurahanUsaha)) {
+                      effectiveList.add(_selectedKelurahanUsaha!);
+                    }
+                    return effectiveList
+                        .map((s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(s, style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14)),
+                            ))
+                        .toList();
+                  }(),
+                  onChanged: _selectedKecamatanUsaha == null
+                      ? null
+                      : (v) {
+                          setState(() {
+                            _selectedKelurahanUsaha = v;
+                          });
+                        },
+                  validator: (v) {
+                    if (!_alamatUsahaSamaDenganDomisili && v == null) {
+                      return 'Pilih kelurahan lokasi usaha';
+                    }
+                    return null;
+                  },
+                  dropdownColor: AppColors.surface,
+                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
+                  decoration: InputDecoration(
+                    hintText: _selectedKecamatanUsaha == null
+                        ? 'Pilih kecamatan terlebih dahulu'
+                        : 'Pilih Kelurahan Lokasi Usaha',
+                    prefixIcon: const Icon(Icons.apartment_outlined),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildField(
+                  controller: _mapsUrlController,
+                  hint: 'Link Google Maps Lokasi Usaha (opsional, contoh: https://maps.app.goo.gl/...)',
+                  icon: Icons.map_outlined,
+                  keyboardType: TextInputType.url,
+                ),
+              ],
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -713,9 +860,8 @@ class _InputFormScreenState extends State<InputFormScreen> {
           sensitivity: _Sensitivity.opsional,
           child: _buildField(
             controller: _marketplaceController,
-            hint: 'Contoh: shopee.co.id/tokokami',
-            icon: Icons.link_rounded,
-            keyboardType: TextInputType.url,
+            hint: 'https://shopee.co.id/... atau Tokopedia/Instagram',
+            icon: Icons.store_outlined,
           ),
         ),
         const SizedBox(height: 16),
@@ -725,54 +871,45 @@ class _InputFormScreenState extends State<InputFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Maks. 5 foto produk unggulan',
-                  style: GoogleFonts.inter(color: AppColors.textHint, fontSize: 11)),
-              const SizedBox(height: 12),
               if (_allProductImages.isNotEmpty) ...[
                 SizedBox(
                   height: 100,
-                  child: ListView.separated(
+                  child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _allProductImages.length,
-                    separatorBuilder: (context, index) => const SizedBox(width: 8),
                     itemBuilder: (context, index) {
-                      final file = _allProductImages[index];
+                      final item = _allProductImages[index];
                       return Stack(
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: file is File
-                                ? Image.file(
-                                    file,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.network(
-                                    file as String,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (ctx, err, st) => Container(
-                                      width: 100,
-                                      height: 100,
-                                      color: Colors.grey[200],
-                                      child: const Icon(Icons.broken_image, size: 20),
-                                    ),
-                                  ),
+                          Container(
+                            width: 100,
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              image: DecorationImage(
+                                image: item is File 
+                                    ? FileImage(item) as ImageProvider
+                                    : NetworkImage(item as String),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
                           Positioned(
                             top: 4,
-                            right: 4,
+                            right: 12,
                             child: GestureDetector(
-                              onTap: () => setState(() => _allProductImages.removeAt(index)),
+                              onTap: () {
+                                setState(() {
+                                  _allProductImages.removeAt(index);
+                                });
+                              },
                               child: Container(
-                                padding: const EdgeInsets.all(4),
+                                padding: const EdgeInsets.all(2),
                                 decoration: const BoxDecoration(
                                   color: Colors.red,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.close, size: 12, color: Colors.white),
+                                child: const Icon(Icons.close, size: 14, color: Colors.white),
                               ),
                             ),
                           ),
@@ -852,6 +989,14 @@ class _InputFormScreenState extends State<InputFormScreen> {
             _SummaryRow('Berdiri', _tahunBerdiriController.text),
             _SummaryRow('Karyawan', '${_karyawanController.text} orang'),
             _SummaryRow('Omzet', _selectedOmzet ?? '-'),
+            _SummaryRow(
+              'Lokasi Usaha',
+              _alamatUsahaSamaDenganDomisili
+                  ? 'Sama dengan alamat domisili pemilik'
+                  : '${_alamatUsahaController.text}, Kel. ${_selectedKelurahanUsaha ?? ''}, Kec. ${_selectedKecamatanUsaha ?? ''}',
+            ),
+            if (!_alamatUsahaSamaDenganDomisili && _mapsUrlController.text.isNotEmpty)
+              _SummaryRow('Link Maps Usaha', _mapsUrlController.text),
           ],
         ),
         const SizedBox(height: 16),
@@ -1173,8 +1318,15 @@ class _InputFormScreenState extends State<InputFormScreen> {
           if (item is String) {
             uploadedUrls.add(item);
           } else if (item is File) {
-            final bytes = await item.readAsBytes();
-            final fileExt = item.path.split('.').last;
+            final compressedBytes = await FlutterImageCompress.compressWithFile(
+              item.absolute.path,
+              minWidth: 1080,
+              minHeight: 1080,
+              quality: 70,
+              format: CompressFormat.webp,
+            );
+            final bytes = compressedBytes ?? await item.readAsBytes();
+            final fileExt = compressedBytes != null ? 'webp' : item.path.split('.').last;
             final path = 'products/${userId}_${DateTime.now().millisecondsSinceEpoch}_$i.$fileExt';
 
             // Unggah ke bucket 'profiles'
@@ -1183,6 +1335,19 @@ class _InputFormScreenState extends State<InputFormScreen> {
             uploadedUrls.add(publicUrl);
           }
         }
+
+        final effectiveAlamatUsaha = _alamatUsahaSamaDenganDomisili
+            ? _alamatController.text.trim()
+            : _alamatUsahaController.text.trim();
+        final effectiveKecamatanUsaha = _alamatUsahaSamaDenganDomisili
+            ? (_selectedKecamatan ?? '')
+            : (_selectedKecamatanUsaha ?? '');
+        final effectiveKelurahanUsaha = _alamatUsahaSamaDenganDomisili
+            ? (_selectedKelurahan ?? '')
+            : (_selectedKelurahanUsaha ?? '');
+        final effectiveMapsUrl = _mapsUrlController.text.trim().isEmpty
+            ? null
+            : _mapsUrlController.text.trim();
 
         if (widget.data != null) {
           // Mode Edit: update data yang sudah ada
@@ -1203,6 +1368,10 @@ class _InputFormScreenState extends State<InputFormScreen> {
             tahunBerdiri: _tahunBerdiriController.text.trim(),
             jumlahKaryawan: int.tryParse(_karyawanController.text) ?? 0,
             omzetPerBulan: _selectedOmzet ?? '',
+            alamatUsaha: effectiveAlamatUsaha,
+            kecamatanUsaha: effectiveKecamatanUsaha,
+            kelurahanUsaha: effectiveKelurahanUsaha,
+            mapsUrl: effectiveMapsUrl,
             hakiTypes: _selectedHaki.toList(),
             nomorHaki: _nomorHakiController.text.isEmpty ? null : _nomorHakiController.text,
             tahunHaki: _tahunHakiController.text.isEmpty ? null : _tahunHakiController.text,
@@ -1236,6 +1405,10 @@ class _InputFormScreenState extends State<InputFormScreen> {
             tahunBerdiri: _tahunBerdiriController.text.trim(),
             jumlahKaryawan: int.tryParse(_karyawanController.text) ?? 0,
             omzetPerBulan: _selectedOmzet ?? '',
+            alamatUsaha: effectiveAlamatUsaha,
+            kecamatanUsaha: effectiveKecamatanUsaha,
+            kelurahanUsaha: effectiveKelurahanUsaha,
+            mapsUrl: effectiveMapsUrl,
             hakiTypes: _selectedHaki.toList(),
             nomorHaki: _nomorHakiController.text.isEmpty ? null : _nomorHakiController.text,
             tahunHaki: _tahunHakiController.text.isEmpty ? null : _tahunHakiController.text,

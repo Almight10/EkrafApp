@@ -8,6 +8,8 @@ import 'dashboard_screen.dart';
 import 'data_list_screen.dart';
 import 'pelaku_dashboard_screen.dart';
 import 'pelaku_data_list_screen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'login_screen.dart';
 import 'lengkapi_profile_screen.dart';
 
 class MainShell extends StatefulWidget {
@@ -42,7 +44,9 @@ class _MainShellState extends State<MainShell> {
             _ProfileScreen(user: user),
           ]
         : [
-            const PelakuDashboardScreen(),
+            PelakuDashboardScreen(
+              onNavigateToDataList: () => setState(() => _currentIndex = 1),
+            ),
             const PelakuDataListScreen(),
             _ProfileScreen(user: user),
           ];
@@ -102,9 +106,33 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-class _ProfileScreen extends StatelessWidget {
+class _ProfileScreen extends StatefulWidget {
   final AppUser user;
   const _ProfileScreen({required this.user});
+
+  @override
+  State<_ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<_ProfileScreen> {
+  String _appVersion = '1.0.0';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPackageInfo();
+  }
+
+  Future<void> _loadPackageInfo() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = info.version;
+        });
+      }
+    } catch (_) {}
+  }
 
   void _showEditProfileDialog(BuildContext context, AppUser user) {
     final nameController = TextEditingController(text: user.namaLengkap);
@@ -331,6 +359,7 @@ class _ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = widget.user;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -513,7 +542,7 @@ class _ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            _buildSectionTitle('Info Akun'),
+            _buildSectionTitle('Info Akun & Aplikasi'),
             const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
@@ -530,12 +559,94 @@ class _ProfileScreen extends StatelessWidget {
                         ? 'Terdaftar sejak ${user.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year}'
                         : (user.isAdmin ? 'Administrator' : 'Pelaku Ekonomi Kreatif'),
                   ),
+                  const Divider(height: 1, indent: 56),
+                  _buildProfileTile(
+                    Icons.info_outline_rounded,
+                    'Versi Aplikasi',
+                    'v$_appVersion',
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
+
+            // Tombol Logout Akun
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () => _showLogoutDialog(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.errorContainer.withValues(alpha: 0.6),
+                  foregroundColor: AppColors.error,
+                  elevation: 0,
+                  side: BorderSide(color: AppColors.error.withValues(alpha: 0.3), width: 1.2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                icon: const Icon(Icons.logout_rounded, size: 20, color: AppColors.error),
+                label: Text(
+                  'Keluar dari Akun',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.error,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 40),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Konfirmasi Logout',
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin keluar dari akun ini?',
+          style: GoogleFonts.inter(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              final authProvider = context.read<AuthProvider>();
+              authProvider.logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => const LoginScreen(showSplash: false),
+                  transitionsBuilder: (_, anim, __, child) =>
+                      FadeTransition(opacity: anim, child: child),
+                  transitionDuration: const Duration(milliseconds: 300),
+                ),
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('Keluar', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

@@ -278,7 +278,10 @@ class AuthService {
   // ════════════════════════════════════════════════════════════════════════════
   Future<void> sendPasswordResetEmail(String email) async {
     try {
-      await _client.auth.resetPasswordForEmail(email.trim());
+      await _client.auth.resetPasswordForEmail(
+        email.trim(),
+        redirectTo: 'io.supabase.ekrafapp://reset-callback/',
+      );
     } on sb.AuthException catch (e) {
       throw AuthException(
         code: e.statusCode ?? 'auth-error',

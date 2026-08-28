@@ -7,7 +7,6 @@ import '../providers/ekraf_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/user_model.dart';
 import 'input_form_screen.dart';
-import 'login_screen.dart';
 import 'data_list_screen.dart';
 import 'detail_screen.dart';
 
@@ -80,54 +79,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     _listCtrl.dispose();
     _chartBarCtrl.dispose();
     super.dispose();
-  }
-
-  void _logout() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Konfirmasi Logout',
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-        ),
-        content: Text(
-          'Apakah Anda yakin ingin keluar dari akun ini?',
-          style: GoogleFonts.inter(color: AppColors.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Batal',
-              style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              final authProvider = context.read<AuthProvider>();
-              authProvider.logout();
-              Navigator.of(context).pushAndRemoveUntil(
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => const LoginScreen(),
-                  transitionsBuilder: (_, anim, __, child) =>
-                      FadeTransition(opacity: anim, child: child),
-                  transitionDuration: const Duration(milliseconds: 300),
-                ),
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: Text('Keluar', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -404,38 +355,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: _logout,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.logout_rounded,
-                          size: 18, color: Colors.white),
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 16),
               const Divider(color: Colors.white24, height: 1),
               const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: _InfoChip(
-                        icon: Icons.badge_outlined,
-                        text: user.nik ?? '-'),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _InfoChip(
-                        icon: Icons.phone_outlined,
-                        text: user.noHp ?? '-'),
-                  ),
-                ],
-              ),
+              _InfoChip(icon: Icons.phone_outlined, text: user.noHp ?? '-'),
               const SizedBox(height: 8),
               _InfoChip(icon: Icons.email_outlined, text: user.email),
             ],
@@ -1028,22 +953,53 @@ class _AntrianCardState extends State<_AntrianCard> {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: AppColors.primaryFixed,
-                      backgroundImage: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
-                          ? NetworkImage(data.fotoUrl!)
-                          : null,
-                      child: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
-                          ? null
-                          : Text(
-                              initials,
-                              style: GoogleFonts.inter(
-                                color: AppColors.primary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryFixed,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                          width: 1,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(11),
+                        child: (data.productImagePaths.isNotEmpty &&
+                                data.productImagePaths.first.trim().isNotEmpty)
+                            ? Image.network(
+                                data.productImagePaths.first.trim(),
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                                        ? Image.network(data.fotoUrl!, fit: BoxFit.cover)
+                                        : Center(
+                                            child: Text(
+                                              initials,
+                                              style: GoogleFonts.inter(
+                                                color: AppColors.primary,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                              )
+                            : (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                                ? Image.network(data.fotoUrl!, fit: BoxFit.cover)
+                                : Center(
+                                    child: Text(
+                                      initials,
+                                      style: GoogleFonts.inter(
+                                        color: AppColors.primary,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(

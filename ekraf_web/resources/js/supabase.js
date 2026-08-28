@@ -98,20 +98,20 @@ export function normalizeEkrafData(row) {
         (row.identitas?.foto_url && String(row.identitas.foto_url).trim()) ||
         '';
 
-    const alamatStr =
-        (row.alamat && String(row.alamat).trim()) ||
-        (usersData.alamat && String(usersData.alamat).trim()) ||
-        '';
-    const kecamatanStr =
-        (row.kecamatan && String(row.kecamatan).trim()) ||
-        (usersData.kecamatan && String(usersData.kecamatan).trim()) ||
-        '';
-    const kelurahanStr =
-        (row.kelurahan && String(row.kelurahan).trim()) ||
-        (usersData.kelurahan && String(usersData.kelurahan).trim()) ||
-        '';
+    // Alamat Usaha (prioritas) dan Alamat Domisili Pemilik (fallback)
+    const alamatUsahaStr = (row.alamat_usaha && String(row.alamat_usaha).trim()) || (row.usaha?.alamat && String(row.usaha.alamat).trim()) || '';
+    const kecamatanUsahaStr = (row.kecamatan_usaha && String(row.kecamatan_usaha).trim()) || '';
+    const kelurahanUsahaStr = (row.kelurahan_usaha && String(row.kelurahan_usaha).trim()) || '';
 
-    const lokasiLengkap = [alamatStr, kelurahanStr ? `Kel. ${kelurahanStr}` : '', kecamatanStr ? `Kec. ${kecamatanStr}` : '']
+    const alamatStr = (row.alamat && String(row.alamat).trim()) || (usersData.alamat && String(usersData.alamat).trim()) || (row.users?.alamat && String(row.users.alamat).trim()) || '';
+    const kecamatanStr = (row.kecamatan && String(row.kecamatan).trim()) || (usersData.kecamatan && String(usersData.kecamatan).trim()) || (row.users?.kecamatan && String(row.users.kecamatan).trim()) || '';
+    const kelurahanStr = (row.kelurahan && String(row.kelurahan).trim()) || (usersData.kelurahan && String(usersData.kelurahan).trim()) || (row.users?.kelurahan && String(row.users.kelurahan).trim()) || '';
+
+    const effectiveAlamat = alamatUsahaStr || alamatStr;
+    const effectiveKelurahan = kelurahanUsahaStr || kelurahanStr;
+    const effectiveKecamatan = kecamatanUsahaStr || kecamatanStr;
+
+    const lokasiLengkap = [effectiveAlamat, effectiveKelurahan ? `Kel. ${effectiveKelurahan}` : '', effectiveKecamatan ? `Kec. ${effectiveKecamatan}` : '']
         .filter(Boolean)
         .join(', ') || 'Kota Probolinggo';
 
@@ -124,6 +124,10 @@ export function normalizeEkrafData(row) {
             usaha: {
                 ...row.usaha,
                 alamat: currentAlamat,
+                alamat_usaha: alamatUsahaStr || alamatStr,
+                kecamatan_usaha: kecamatanUsahaStr || kecamatanStr,
+                kelurahan_usaha: kelurahanUsahaStr || kelurahanStr,
+                maps_url: row.maps_url || row.usaha.maps_url || '',
             },
             identitas: {
                 ...row.identitas,
@@ -148,6 +152,10 @@ export function normalizeEkrafData(row) {
             sub_sektor_id: normalizeSubSektor(row.sub_sektor || row.subSektor || ''),
             jenis_usaha: row.deskripsi_usaha || row.deskripsiUsaha || '',
             alamat: lokasiLengkap,
+            alamat_usaha: alamatUsahaStr || alamatStr,
+            kecamatan_usaha: kecamatanUsahaStr || kecamatanStr,
+            kelurahan_usaha: kelurahanUsahaStr || kelurahanStr,
+            maps_url: row.maps_url || '',
         },
         produk: {
             harga: parseHarga(row.harga_produk || row.hargaProduk || '0'),

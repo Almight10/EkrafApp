@@ -11,12 +11,19 @@ class AuthProvider extends ChangeNotifier {
   AppUser? _currentUser;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isPasswordRecovery = false;
 
   // ── Getters ──────────────────────────────────────────────────────────────────
   AppUser? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get isPasswordRecovery => _isPasswordRecovery;
+
+  void setPasswordRecovery(bool value) {
+    _isPasswordRecovery = value;
+    notifyListeners();
+  }
 
   // ════════════════════════════════════════════════════════════════════════════
   // LOGIN

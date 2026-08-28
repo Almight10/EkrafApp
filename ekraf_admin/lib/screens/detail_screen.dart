@@ -220,6 +220,14 @@ class _DetailScreenState extends State<DetailScreen>
           _InfoItem('Deskripsi Usaha', data.deskripsiUsaha),
         ]),
         const SizedBox(height: 16),
+        _SectionCard(title: 'Lokasi & Tempat Usaha', items: [
+          _InfoItem('Alamat Tempat Usaha', data.displayAlamatUsaha),
+          _InfoItem('Kecamatan', data.displayKecamatanUsaha),
+          _InfoItem('Kelurahan', data.displayKelurahanUsaha),
+          if (data.mapsUrl != null && data.mapsUrl!.isNotEmpty)
+            _InfoItem('Google Maps', data.mapsUrl!),
+        ]),
+        const SizedBox(height: 16),
         _SectionCard(title: 'Kekayaan Intelektual (HAKI)', items: [
           _InfoItem(
               'Jenis HAKI',

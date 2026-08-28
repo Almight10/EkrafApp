@@ -8,11 +8,12 @@ import '../providers/auth_provider.dart';
 import '../models/user_model.dart';
 import 'input_form_screen.dart';
 import 'detail_screen.dart';
-import 'login_screen.dart';
 import 'lengkapi_profile_screen.dart';
+import 'pelaku_data_list_screen.dart';
 
 class PelakuDashboardScreen extends StatefulWidget {
-  const PelakuDashboardScreen({super.key});
+  final VoidCallback? onNavigateToDataList;
+  const PelakuDashboardScreen({super.key, this.onNavigateToDataList});
 
   @override
   State<PelakuDashboardScreen> createState() => _PelakuDashboardScreenState();
@@ -57,54 +58,6 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
     _heroCtrl.dispose();
     _listCtrl.dispose();
     super.dispose();
-  }
-
-  void _logout() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Konfirmasi Logout',
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-        ),
-        content: Text(
-          'Apakah Anda yakin ingin keluar dari akun ini?',
-          style: GoogleFonts.inter(color: AppColors.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Batal',
-              style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              final authProvider = context.read<AuthProvider>();
-              authProvider.logout();
-              Navigator.of(context).pushAndRemoveUntil(
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => const LoginScreen(),
-                  transitionsBuilder: (_, anim, __, child) =>
-                      FadeTransition(opacity: anim, child: child),
-                  transitionDuration: const Duration(milliseconds: 300),
-                ),
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: Text('Keluar', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showNotifications() {
@@ -278,6 +231,18 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
     );
   }
 
+  void _navigateToDataList() {
+    final cb = widget.onNavigateToDataList;
+    if (cb != null) {
+      cb();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const PelakuDataListScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -296,7 +261,10 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
       return item.userId == user.id ||
           (item.email.isNotEmpty && item.email.toLowerCase() == user.email.toLowerCase()) ||
           (user.nik != null && user.nik!.isNotEmpty && item.nik == user.nik);
-    }).toList();
+    }).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    final recentSubmissions = userSubmissions.take(3).toList();
 
     final verified = userSubmissions
         .where((d) => d.status == VerificationStatus.verified)
@@ -432,28 +400,60 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Riwayat Pengajuan',
-                          style: GoogleFonts.inter(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary),
+                        Row(
+                          children: [
+                            Text(
+                              'Riwayat Pengajuan',
+                              style: GoogleFonts.inter(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary),
+                            ),
+                            if (userSubmissions.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryFixed,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '${userSubmissions.length}',
+                                  style: GoogleFonts.inter(
+                                      color: AppColors.primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryFixed,
-                            borderRadius: BorderRadius.circular(20),
+                        if (userSubmissions.length > 3)
+                          TextButton(
+                            onPressed: _navigateToDataList,
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Lihat Usaha',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primary),
+                                ),
+                                const SizedBox(width: 2),
+                                const Icon(Icons.arrow_forward_ios_rounded,
+                                    size: 11, color: AppColors.primary),
+                              ],
+                            ),
                           ),
-                          child: Text(
-                            '${userSubmissions.length} data',
-                            style: GoogleFonts.inter(
-                                color: AppColors.primary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -476,19 +476,19 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
                   (context, index) => FadeTransition(
                     opacity: _listFade,
                     child: SubmissionCard(
-                      data: userSubmissions[index],
+                      data: recentSubmissions[index],
                       onTap: () async {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) =>
-                                  DetailScreen(data: userSubmissions[index])),
+                                  DetailScreen(data: recentSubmissions[index])),
                         );
                         if (mounted) ekrafProvider.loadData();
                       },
                     ),
                   ),
-                  childCount: userSubmissions.length,
+                  childCount: recentSubmissions.length,
                 ),
               ),
             const SliverToBoxAdapter(child: SizedBox(height: 120)),
@@ -632,18 +632,6 @@ class _PelakuDashboardScreenState extends State<PelakuDashboardScreen>
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: _logout,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.logout_rounded,
-                          size: 18, color: Colors.white),
                     ),
                   ),
                 ],
@@ -1043,14 +1031,51 @@ class SubmissionCardState extends State<SubmissionCard> {
               Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: AppColors.primaryFixed,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                        width: 1,
+                      ),
                     ),
-                    child: const Icon(Icons.storefront_rounded,
-                        color: AppColors.primary, size: 22),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(11),
+                      child: (data.productImagePaths.isNotEmpty &&
+                              data.productImagePaths.first.trim().isNotEmpty)
+                          ? Image.network(
+                              data.productImagePaths.first.trim(),
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                color: AppColors.primaryFixed,
+                                child: const Icon(Icons.storefront_rounded,
+                                    color: AppColors.primary, size: 22),
+                              ),
+                              loadingBuilder: (context, child, progress) {
+                                if (progress == null) return child;
+                                return Container(
+                                  color: AppColors.surfaceContainerLow,
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : const Icon(Icons.storefront_rounded,
+                              color: AppColors.primary, size: 22),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

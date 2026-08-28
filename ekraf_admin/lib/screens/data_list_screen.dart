@@ -644,21 +644,51 @@ class _EkrafListItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.surfaceContainer,
-                  backgroundImage: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
-                      ? NetworkImage(data.fotoUrl!)
-                      : null,
-                  child: (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
-                      ? null
-                      : Text(
-                          data.namaLengkap.isNotEmpty ? data.namaLengkap[0].toUpperCase() : '?',
-                          style: const TextStyle(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
-                        ),
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryFixed,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                      width: 1,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(11),
+                    child: (data.productImagePaths.isNotEmpty &&
+                            data.productImagePaths.first.trim().isNotEmpty)
+                        ? Image.network(
+                            data.productImagePaths.first.trim(),
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                                    ? Image.network(data.fotoUrl!, fit: BoxFit.cover)
+                                    : Center(
+                                        child: Text(
+                                          data.namaUsaha.isNotEmpty ? data.namaUsaha[0].toUpperCase() : '?',
+                                          style: const TextStyle(
+                                              color: AppColors.primary,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
+                                        ),
+                                      ),
+                          )
+                        : (data.fotoUrl != null && data.fotoUrl!.isNotEmpty)
+                            ? Image.network(data.fotoUrl!, fit: BoxFit.cover)
+                            : Center(
+                                child: Text(
+                                  data.namaUsaha.isNotEmpty ? data.namaUsaha[0].toUpperCase() : '?',
+                                  style: const TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                              ),
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

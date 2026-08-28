@@ -38,6 +38,10 @@ class EkrafData {
   final String tahunBerdiri;
   final int jumlahKaryawan;
   final String omzetPerBulan;
+  final String? alamatUsaha;
+  final String? kecamatanUsaha;
+  final String? kelurahanUsaha;
+  final String? mapsUrl;
 
   // HAKI
   final List<HakiType> hakiTypes;
@@ -74,6 +78,10 @@ class EkrafData {
     required this.tahunBerdiri,
     required this.jumlahKaryawan,
     required this.omzetPerBulan,
+    this.alamatUsaha,
+    this.kecamatanUsaha,
+    this.kelurahanUsaha,
+    this.mapsUrl,
     required this.hakiTypes,
     this.nomorHaki,
     this.tahunHaki,
@@ -92,6 +100,10 @@ class EkrafData {
     VerificationStatus? status,
     String? catatanAdmin,
     DateTime? verifiedAt,
+    String? alamatUsaha,
+    String? kecamatanUsaha,
+    String? kelurahanUsaha,
+    String? mapsUrl,
   }) {
     return EkrafData(
       id: id,
@@ -111,6 +123,10 @@ class EkrafData {
       tahunBerdiri: tahunBerdiri,
       jumlahKaryawan: jumlahKaryawan,
       omzetPerBulan: omzetPerBulan,
+      alamatUsaha: alamatUsaha ?? this.alamatUsaha,
+      kecamatanUsaha: kecamatanUsaha ?? this.kecamatanUsaha,
+      kelurahanUsaha: kelurahanUsaha ?? this.kelurahanUsaha,
+      mapsUrl: mapsUrl ?? this.mapsUrl,
       hakiTypes: hakiTypes,
       nomorHaki: nomorHaki,
       tahunHaki: tahunHaki,
@@ -136,6 +152,16 @@ class EkrafData {
     }
   }
 
+  /// Alamat efektif tempat usaha (menggunakan alamat usaha jika ada, fallback ke alamat domisili pelaku)
+  String get displayAlamatUsaha =>
+      (alamatUsaha != null && alamatUsaha!.trim().isNotEmpty) ? alamatUsaha! : alamat;
+
+  String get displayKecamatanUsaha =>
+      (kecamatanUsaha != null && kecamatanUsaha!.trim().isNotEmpty) ? kecamatanUsaha! : kecamatan;
+
+  String get displayKelurahanUsaha =>
+      (kelurahanUsaha != null && kelurahanUsaha!.trim().isNotEmpty) ? kelurahanUsaha! : kelurahan;
+
   factory EkrafData.fromSupabase(Map<String, dynamic> map) {
     final users = map['users'] as Map<String, dynamic>?;
     return EkrafData(
@@ -157,6 +183,10 @@ class EkrafData {
       tahunBerdiri: map['tahun_berdiri'] as String? ?? '',
       jumlahKaryawan: map['jumlah_karyawan'] as int? ?? 0,
       omzetPerBulan: map['omzet_per_bulan'] as String? ?? '',
+      alamatUsaha: map['alamat_usaha'] as String?,
+      kecamatanUsaha: map['kecamatan_usaha'] as String?,
+      kelurahanUsaha: map['kelurahan_usaha'] as String?,
+      mapsUrl: map['maps_url'] as String?,
       hakiTypes: (map['haki_types'] as String? ?? '')
           .split(',')
           .where((s) => s.isNotEmpty)
@@ -187,6 +217,10 @@ class EkrafData {
       'tahun_berdiri': tahunBerdiri,
       'jumlah_karyawan': jumlahKaryawan,
       'omzet_per_bulan': omzetPerBulan,
+      'alamat_usaha': alamatUsaha,
+      'kecamatan_usaha': kecamatanUsaha,
+      'kelurahan_usaha': kelurahanUsaha,
+      'maps_url': mapsUrl,
       'haki_types': hakiTypes.map((e) => e.name).join(','),
       'nomor_haki': nomorHaki,
       'tahun_haki': tahunHaki,

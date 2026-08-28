@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
@@ -103,8 +104,15 @@ class _LengkapiProfileScreenState extends State<LengkapiProfileScreen> {
   }
 
   Future<String?> _uploadToStorage(File file, String folder, String userId) async {
-    final bytes = await file.readAsBytes();
-    final fileExt = file.path.split('.').last;
+    final compressedBytes = await FlutterImageCompress.compressWithFile(
+      file.absolute.path,
+      minWidth: 1080,
+      minHeight: 1080,
+      quality: 70,
+      format: CompressFormat.webp,
+    );
+    final bytes = compressedBytes ?? await file.readAsBytes();
+    final fileExt = compressedBytes != null ? 'webp' : file.path.split('.').last;
     final path = '$folder/${userId}_${DateTime.now().millisecondsSinceEpoch}.$fileExt';
 
     try {

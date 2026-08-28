@@ -66,3 +66,7 @@ build/
 
 # Java heap dump files
 *.hprof
+
+# Build outputs
+*.apk
+*.aab
