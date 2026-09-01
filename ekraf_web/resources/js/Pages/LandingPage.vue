@@ -18,7 +18,7 @@
             <!-- Hero Action Buttons -->
             <div class="hero__actions">
               <a href="/katalog" class="btn btn-primary btn-lg">Mulai Eksplorasi</a>
-              <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">Daftar Kreator (Download App)</a>
+              <a href="https://github.com/Gerryrag/ekrafApp/releases/download/ekraf/Kreasi-Ekraf.apk" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">Daftar Kreator (Download App)</a>
             </div>
           </div>
 
@@ -162,7 +162,7 @@
           <p style="color:var(--clr-muted);line-height:1.7;margin-bottom:2rem;font-size:0.95rem;">
             Daftarkan portofolio Anda, verifikasi Hak Kekayaan Intelektual (HAKI), dan temukan audiens global untuk karya terbaik Anda.
           </p>
-          <a href="https://github.com/Gerryrag/ekrafApp/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">Download Aplikasi Kreator</a>
+          <a href="https://github.com/Gerryrag/ekrafApp/releases/download/ekraf/Kreasi-Ekraf.apk" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">Download Aplikasi Kreator</a>
         </div>
       </div>
     </section>
