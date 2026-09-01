@@ -104,7 +104,7 @@
         <div>
           <div style="font-family:var(--font-mono);font-weight:700;font-size:0.75rem;text-transform:uppercase;color:var(--clr-charcoal);margin-bottom:0.75rem;">Pusat Bantuan</div>
           <ul class="footer__links">
-            <li><a href="https://github.com/Gerryrag/ekrafApp/releases/download/ekraf/Kreasi-Ekraf.apk" target="_blank" rel="noopener noreferrer">Download Aplikasi Kreator</a></li>
+            <li><a href="/download-apk" target="_blank" rel="noopener noreferrer">Download Aplikasi Kreator</a></li>
             <li><a href="#">Hubungi Dinas Kepemudaan Olahraga dan Pariwisata Kota Probolinggo</a></li>
           </ul>
         </div>

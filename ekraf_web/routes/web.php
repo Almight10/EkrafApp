@@ -26,3 +26,7 @@ Route::get('/produk/{id}', [EkrafController::class, 'show'])->name('produk.show'
 Route::get('/artists', [EkrafController::class, 'katalog']);
 Route::get('/exhibitions', [EkrafController::class, 'katalog']);
 Route::get('/collect', [EkrafController::class, 'katalog']);
+
+// Automatic Dynamic APK Download Route
+Route::get('/download-apk', [EkrafController::class, 'downloadApk'])->name('download.apk');
+
