@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EkrafController;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,4 +30,13 @@ Route::get('/collect', [EkrafController::class, 'katalog']);
 
 // Automatic Dynamic APK Download Route
 Route::get('/download-apk', [EkrafController::class, 'downloadApk'])->name('download.apk');
+
+// Fallback Route for custom 404 error page (e.g., /katal -> Error.vue)
+Route::fallback(function () {
+    return Inertia::render('Error', [
+        'status' => 404,
+        'path' => request()->path(),
+    ])->toResponse(request())->setStatusCode(404);
+});
+
 
