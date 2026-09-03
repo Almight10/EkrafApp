@@ -2,19 +2,15 @@
   <MainLayout>
     <div class="error-page">
       <div class="container">
-        <div class="error-box">
+        <div class="error-content">
           <div class="error-code">404</div>
-          <h1 class="display-lg error-title">
-            Ops! Halaman Ini <span class="serif-italic">Belum Ditemukan</span>
-          </h1>
+          <h1 class="error-title">Halaman Tidak Ditemukan</h1>
           <p class="error-desc">
             Maaf, halaman yang Anda cari tidak ditemukan atau telah dipindahkan.
           </p>
-          <div class="error-action">
-            <Link href="/" class="btn btn-primary btn-lg">
-              Kembali ke Beranda
-            </Link>
-          </div>
+          <Link href="/" class="btn btn-outline">
+            Kembali ke Beranda
+          </Link>
         </div>
       </div>
     </div>
@@ -28,49 +24,40 @@ import MainLayout from '@/Layouts/MainLayout.vue';
 
 <style scoped>
 .error-page {
-  padding: 6rem 1.5rem;
+  padding: 5rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 280px);
-}
-
-.error-box {
-  background: #ffffff;
-  border: 1px solid var(--clr-charcoal);
-  box-shadow: 6px 6px 0px rgba(28, 25, 23, 0.85);
-  border-radius: 4px;
-  padding: 3.5rem 2rem;
-  max-width: 560px;
-  margin: 0 auto;
   text-align: center;
 }
 
+.error-content {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 .error-code {
-  font-family: var(--font-serif);
-  font-weight: 800;
-  font-size: clamp(4rem, 10vw, 6.5rem);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 2.25rem;
   color: var(--clr-terracotta);
-  line-height: 1;
+  letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
-  text-shadow: 4px 4px 0px rgba(28, 25, 23, 0.9);
 }
 
 .error-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.5rem;
   color: var(--clr-charcoal);
-  margin: 0.5rem 0 1rem;
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  margin: 0 0 0.75rem;
 }
 
 .error-desc {
   color: var(--clr-muted);
-  font-size: 1rem;
-  margin: 0 0 2rem;
+  font-size: 0.95rem;
+  margin: 0 0 1.75rem;
   line-height: 1.6;
-}
-
-.error-action {
-  display: flex;
-  justify-content: center;
 }
 </style>
